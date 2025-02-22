@@ -54,7 +54,10 @@ class ProductCategoryForm extends FormAbstract
                 ContentFieldOption::make()->label(trans('core/base::forms.description'))
             )
             ->add('status', SelectField::class, StatusFieldOption::make())
-            ->add('show', SelectField::class, SelectFieldOption::make()
+            ->add(
+                'show',
+                SelectField::class,
+                SelectFieldOption::make()
                 ->label(trans('core/base::forms.show_in_front'))
                 ->required()
                 ->choices([
@@ -65,7 +68,7 @@ class ProductCategoryForm extends FormAbstract
             ->add('image', MediaImageField::class, MediaImageFieldOption::make())
             ->add(
                 'icon',
-                $this->getFormHelper()->hasCustomField('themeIcon') ? 'themeIcon' : CoreIconField::class,
+                CoreIconField::class,
                 CoreIconFieldOption::make()
             )
             ->add('icon_image', MediaImageField::class, [

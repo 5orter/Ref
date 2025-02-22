@@ -234,10 +234,12 @@
             top: 0.5rem;
             inset-inline-end: 0.5rem;
             width: 4rem;
+            text-align: end;
 
             img {
                 max-width: 100%;
                 height: auto;
+                max-height: 38px;
             }
         }
     }

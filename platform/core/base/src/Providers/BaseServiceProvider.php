@@ -44,6 +44,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 class BaseServiceProvider extends ServiceProvider
 {
@@ -88,7 +89,7 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->prepareAliasesIfMissing();
 
-        config()->set(['session.cookie' => 'botble_session']);
+        config()->set(['session.cookie' => Str::slug(config('core.base.general.session_cookie', 'botble_session'), '_')]);
 
         $this->overrideDefaultConfigs();
 
@@ -294,6 +295,33 @@ class BaseServiceProvider extends ServiceProvider
 
         if (in_array($timezone, DateTimeZone::listIdentifiers())) {
             date_default_timezone_set($timezone);
+        }
+
+        if ($iframeRegex = Arr::get($baseConfig, 'iframe_regex')) {
+            $baseConfig['purifier']['default']['URI.SafeIframeRegexp'] = $iframeRegex;
+        } else {
+            $allowedIframeUrls = [
+                'www.youtube.com/embed/',
+                'player.vimeo.com/video/',
+                'maps.google.com/maps',
+                'www.google.com/maps|docs.google.com/',
+                'drive.google.com/',
+                'view.officeapps.live.com/op/embed.aspx',
+                'onedrive.live.com/embed',
+                'open.spotify.com/embed',
+                parse_url($config->get('app.url'), PHP_URL_HOST),
+            ];
+
+            if ($extraUrl = Arr::get($baseConfig, 'allowed_iframe_urls', [])) {
+                $allowedIframeUrls = [
+                    ...$allowedIframeUrls,
+                    ...explode('|', $extraUrl),
+                ];
+            }
+
+            $allowedIframeUrls = implode('|', apply_filters('core_allowed_iframe_urls', $allowedIframeUrls));
+
+            $baseConfig['purifier']['default']['URI.SafeIframeRegexp'] = '%^(http://|https://|//)(' . $allowedIframeUrls . ')%';
         }
 
         $config->set([

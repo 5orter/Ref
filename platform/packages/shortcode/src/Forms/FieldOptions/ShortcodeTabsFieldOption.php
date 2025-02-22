@@ -9,6 +9,10 @@ use Illuminate\Support\Arr;
 
 class ShortcodeTabsFieldOption extends FormFieldOptions
 {
+    protected array|bool $wrapperAttributes = [
+        'class' => 'mb-3',
+    ];
+
     public static function make(): static
     {
         return parent::make()->max(20);

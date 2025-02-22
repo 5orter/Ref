@@ -117,6 +117,7 @@
                 } else {
                     $('.add-to-cart-form').find('.error-message').hide()
                     $('.product-price span.current-price').text(response.data.display_sale_price)
+
                     if (response.data.sale_price !== response.data.price) {
                         $('.product-price span.old-price').text(response.data.display_price).removeClass('d-none')
                         $('.product-price span.save-price .percentage-off').text(response.data.sale_percentage)
@@ -141,7 +142,6 @@
                         buttonSubmit.prop('disabled', true).addClass('btn-disabled')
                         $('.number-items-available').html('<span class="text-danger">' + response.data.error_message + '</span>').removeClass('d-none')
                     } else if (response.data.success_message) {
-                        console.log(response.data.success_message)
                         $('.number-items-available').html(response.data.success_message).addClass('text-success').removeClass('d-none')
                     } else {
                         $('.number-items-available').html('').addClass('d-none')
@@ -1047,24 +1047,21 @@
                 const name = $el.attr('name')
                 let value = parseParams[name] || null
                 const type = $el.attr('type')
-                switch (type) {
-                    case 'checkbox':
-                        $el.prop('checked', false)
-                        if (Array.isArray(value)) {
-                            $el.prop('checked', value.includes($el.val()))
-                        } else {
-                            $el.prop('checked', !!value)
-                        }
-                        break
-                    default:
-                        if ($el.is('[name=max_price]')) {
-                            $el.val(value || $el.data('max'))
-                        } else if ($el.is('[name=min_price]')) {
-                            $el.val(value || $el.data('min'))
-                        } else if ($el.val() != value) {
-                            $el.val(value)
-                        }
-                        break
+                if (type === 'checkbox') {
+                    $el.prop('checked', false)
+                    if (Array.isArray(value)) {
+                        $el.prop('checked', value.includes($el.val()))
+                    } else {
+                        $el.prop('checked', !!value)
+                    }
+                } else {
+                    if ($el.is('[name=max_price]')) {
+                        $el.val(value || $el.data('max'))
+                    } else if ($el.is('[name=min_price]')) {
+                        $el.val(value || $el.data('min'))
+                    } else if ($el.val() != value) {
+                        $el.val(value)
+                    }
                 }
 
                 $el.trigger('change')
@@ -1284,6 +1281,15 @@
                                 window.history.pushState(data, response.message, nextHref)
                             }
                             checkHasAnyFilter(formData)
+
+                            document.dispatchEvent(
+                                new CustomEvent('ecommerce.product-filter.success', {
+                                    detail: {
+                                        data,
+                                        element: $form,
+                                    },
+                                })
+                            )
                         } else {
                             showError(response.message || 'Opp!')
                         }

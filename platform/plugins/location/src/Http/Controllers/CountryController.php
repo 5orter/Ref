@@ -82,7 +82,7 @@ class CountryController extends BaseController
 
         $data = Country::query()
             ->where('name', 'LIKE', '%' . $keyword . '%')
-            ->select(['id', 'name'])
+            ->select(['id', 'name', 'code'])
             ->take(10)
             ->oldest('order')
             ->oldest('name')

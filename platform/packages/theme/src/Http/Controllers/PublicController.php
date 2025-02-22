@@ -9,6 +9,7 @@ use Botble\Page\Models\Page;
 use Botble\Page\Services\PageService;
 use Botble\SeoHelper\Facades\SeoHelper;
 use Botble\Slug\Facades\SlugHelper;
+use Botble\Slug\Models\Slug;
 use Botble\Theme\Events\RenderingHomePageEvent;
 use Botble\Theme\Events\RenderingSingleEvent;
 use Botble\Theme\Events\RenderingSiteMapEvent;
@@ -25,6 +26,8 @@ class PublicController extends BaseController
 
         if (defined('PAGE_MODULE_SCREEN_NAME') && BaseHelper::getHomepageId()) {
             $data = (new PageService())->handleFrontRoutes(null);
+
+            event(new RenderingSingleEvent(new Slug()));
 
             if ($data) {
                 return Theme::scope($data['view'], $data['data'], $data['default_view'])->render();
@@ -104,7 +107,7 @@ class PublicController extends BaseController
             event(new RenderingSiteMapEvent($key));
         }
 
-        // show your site map (options: 'xml' (default), 'html', 'txt', 'ror-rss', 'ror-rdf')
+        // show your site map (options: 'xml' (default), 'xml-mobile', 'html', 'txt', 'ror-rss', 'ror-rdf', 'google-news')
         return SiteMapManager::render($key ? $extension : 'sitemapindex');
     }
 

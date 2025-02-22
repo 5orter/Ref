@@ -5,6 +5,7 @@ namespace Botble\Ecommerce\Models;
 use Botble\Base\Events\CreatedContentEvent;
 use Botble\Base\Events\DeletedContentEvent;
 use Botble\Base\Models\BaseModel;
+use Botble\Ecommerce\Events\ProductQuantityUpdatedEvent;
 use Botble\Ecommerce\Services\Products\UpdateDefaultProductService;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -38,6 +39,8 @@ class ProductVariation extends BaseModel
         self::updated(function (ProductVariation $variation): void {
             if ($variation->is_default) {
                 app(UpdateDefaultProductService::class)->execute($variation->product);
+
+                ProductQuantityUpdatedEvent::dispatch($variation->product);
             }
         });
     }

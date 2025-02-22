@@ -16,7 +16,7 @@ use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Throwable;
 
 class SystemController extends BaseSystemController
@@ -96,7 +96,7 @@ class SystemController extends BaseSystemController
 
         $this->pageTitle(trans('core/base::system.updater'));
 
-        $activated = $core->verifyLicense();
+        $activated = $core->verifyLicense(false, 15);
         $isOutdated = false;
 
         try {
@@ -160,7 +160,10 @@ class SystemController extends BaseSystemController
         Assets::addScriptsDirectly('vendor/core/core/base/js/cleanup.js');
 
         try {
-            $tables = DB::connection()->getDoctrineSchemaManager()->listTableNames();
+            $tables = array_map(function (array $table) {
+                return $table['name'];
+            }, Schema::getTables());
+
         } catch (Throwable) {
             $tables = [];
         }

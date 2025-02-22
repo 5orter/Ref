@@ -8,6 +8,11 @@
             @foreach (SocialService::getProviderKeys() as $item)
                 @continue(! SocialService::getProviderEnabled($item))
 
+                @if ($item === 'google' && setting('social_login_google_use_google_button', false) && false)
+                    @include('plugins/social-login::google-sign-in-button')
+                    @continue
+                @endif
+
                 <li>
                     <a href="{{ route('auth.social', array_merge([$item], $params)) }}" class="social-login {{ $item }}-login">
                         @php
@@ -24,6 +29,11 @@
         <ul @class(['social-icons', 'social-login-lg' => setting('social_login_style', 'default') === 'default'])>
             @foreach (SocialService::getProviderKeys() as $item)
                 @continue(! SocialService::getProviderEnabled($item))
+
+                @if ($item === 'google' && setting('social_login_google_use_google_button', false) && false)
+                    @include('plugins/social-login::google-sign-in-button')
+                    @continue
+                @endif
 
                 {!! apply_filters(
                     'social_login_' . $item . '_render',

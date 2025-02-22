@@ -155,7 +155,7 @@ class DashboardController extends BaseController
             ->get();
 
         $totalProducts = $store->products()->count();
-        $totalOrders = $store->orders()->count();
+        $totalOrders = $store->count();
         $compact = compact('user', 'store', 'data', 'totalProducts', 'totalOrders');
 
         if ($request->ajax()) {

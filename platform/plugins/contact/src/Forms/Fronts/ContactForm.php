@@ -27,6 +27,7 @@ use Botble\Contact\Enums\CustomFieldType;
 use Botble\Contact\Http\Requests\ContactRequest;
 use Botble\Contact\Models\Contact;
 use Botble\Contact\Models\CustomField;
+use Botble\Theme\Facades\Theme;
 use Botble\Theme\FormFront;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
@@ -89,7 +90,7 @@ class ContactForm extends FormFront
             )
             ->addRowWrapper('form_wrapper', function (self $form) use ($displayFields, $mandatoryFields): void {
                 $customFields = CustomField::query()
-                    ->wherePublished()->with('options')
+                    ->wherePublished()
                     ->orderBy('order')
                     ->get();
 
@@ -182,7 +183,9 @@ class ContactForm extends FormFront
                     })
                     ->when($customFields, function (ContactForm $form, Collection $customFields): void {
                         foreach ($customFields as $customField) {
-                            $options = $customField->options->pluck('label', 'value')->all();
+                            $options = $customField->options()->select('id', 'label', 'value')->get()->mapWithKeys(function ($option) {
+                                return [$option->value => $option->label];
+                            })->all();
 
                             $fieldOptions = match ($customField->type->getValue()) {
                                 CustomFieldType::NUMBER => NumberFieldOption::make()
@@ -262,7 +265,7 @@ class ContactForm extends FormFront
                 OnOffCheckboxField::class,
                 CheckboxFieldOption::make()
                     ->label(
-                        ($privacyPolicyUrl = theme_option('term_and_privacy_policy_url'))
+                        ($privacyPolicyUrl = Theme::termAndPrivacyPolicyUrl())
                             ? __('I agree to the :link', ['link' => Html::link($privacyPolicyUrl, __('Terms and Privacy Policy'), attributes: ['class' => 'text-decoration-underline', 'target' => '_blank'])])
                             : __('I agree to the Terms and Privacy Policy')
                     )

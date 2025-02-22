@@ -45,7 +45,7 @@
                         @include('plugins/ecommerce::shipping.rules.form')
                     </x-core::form.fieldset>
 
-                    @if ($rule && $rule->type->allowRuleItems() && Auth::user()->hasPermission('settings.index.shipping'))
+                    @if ($rule && $rule->type->allowRuleItems() && Auth::user()->hasPermission('ecommerce.settings.shipping'))
                         @include('plugins/ecommerce::shipping.items.index', [
                             'total' => $rule->items_count,
                         ])

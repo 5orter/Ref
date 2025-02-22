@@ -36,7 +36,7 @@ class MediaFolder extends BaseModel
     {
         static::deleted(function (MediaFolder $folder): void {
             if ($folder->isForceDeleting()) {
-                $folder->files()->onlyTrashed()->each(fn (MediaFile $file) => $file->forceDelete());
+                $folder->files()->withTrashed()->each(fn (MediaFile $file) => $file->forceDelete());
 
                 if (Storage::directoryExists($folder->slug)) {
                     Storage::deleteDirectory($folder->slug);

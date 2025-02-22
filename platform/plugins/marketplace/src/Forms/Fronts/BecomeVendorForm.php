@@ -103,7 +103,7 @@ class BecomeVendorForm extends FormAbstract
                 OnOffCheckboxField::class,
                 CheckboxFieldOption::make()
                     ->when(
-                        $privacyPolicyUrl = MarketplaceHelper::getSetting('term_and_privacy_policy_url') ?: theme_option('term_and_privacy_policy_url'),
+                        $privacyPolicyUrl = MarketplaceHelper::getSetting('term_and_privacy_policy_url') ?: Theme::termAndPrivacyPolicyUrl(),
                         function (CheckboxFieldOption $fieldOption, string $url): void {
                             $fieldOption->label(__('I agree to the :link', ['link' => Html::link($url, __('Terms and Privacy Policy'), attributes: ['class' => 'text-decoration-underline', 'target' => '_blank'])]));
                         }

@@ -29,7 +29,7 @@
                         </figure>
                         <p class="heading-card"><a href="{{ $category->url }}" title="{{ $category->name }}">{{ $category->name }}</a></p>
                         @if (($shortcode->show_products_count ?: 'yes') == 'yes')
-                            <span>{{ __(':count items', ['count' => $category->products_count]) }}</span>
+                            <span>{{ __(':count items', ['count' => $category->count_all_products]) }}</span>
                         @endif
                     </div>
                @endforeach

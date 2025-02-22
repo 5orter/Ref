@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class ShortcodeField
 {
-    public function tabs(array $fields, array $attributes = [], int $max = 20, int $min = 1, ?string $tabKey = null): string
+    public function tabs(array $fields, array $attributes = [], int $max = 20, int $min = 1, ?string $tabKey = null, $wrapperAttributes = []): string
     {
         if (! $fields) {
             return '';
@@ -23,7 +23,7 @@ class ShortcodeField
 
         return view(
             'packages/shortcode::fields.tabs',
-            compact('fields', 'attributes', 'current', 'selector', 'choices', 'max', 'min', 'tabKey')
+            compact('fields', 'attributes', 'current', 'selector', 'choices', 'max', 'min', 'tabKey', 'wrapperAttributes')
         )->render();
     }
 

@@ -19,7 +19,7 @@ class OtherTranslationExporter extends Exporter
     public function columns(): array
     {
         $columns = [
-            ExportColumn::make('key')->disabled(),
+            ExportColumn::make('key')->disabled()->label('key'),
         ];
 
         foreach (Language::getAvailableLocales() as $locale) {

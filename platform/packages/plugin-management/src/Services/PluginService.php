@@ -15,7 +15,9 @@ use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -23,6 +25,8 @@ use Throwable;
 
 class PluginService
 {
+    protected static array $activatedPlugins = [];
+
     public function __construct(
         protected Application $app,
         protected Filesystem $files,
@@ -379,6 +383,10 @@ class PluginService
         Helper::clearCache();
         $cacheService = ClearCacheService::make();
 
+        Cache::forget('core_installed_plugins');
+
+        self::$activatedPlugins = [];
+
         $cacheService->clearConfig();
         $cacheService->clearRoutesCache();
     }
@@ -497,5 +505,68 @@ class PluginService
         }
 
         return false;
+    }
+
+    public static function getActivatedPlugins(): array
+    {
+        if (self::$activatedPlugins && ! app()->runningInConsole()) {
+            return self::$activatedPlugins;
+        }
+
+        if (
+            Cache::has($key = 'core_installed_plugins')
+            && ! app()->runningInConsole()
+            && ($activatedPlugins = Cache::get($key))
+        ) {
+            self::$activatedPlugins = $activatedPlugins;
+
+            return $activatedPlugins;
+        }
+
+        $activatedPlugins = Setting::get('activated_plugins');
+
+        if (! $activatedPlugins) {
+            return [];
+        }
+
+        $activatedPlugins = json_decode($activatedPlugins, true);
+
+        if (! $activatedPlugins) {
+            return [];
+        }
+
+        $plugins = array_unique($activatedPlugins);
+
+        $existingPlugins = BaseHelper::scanFolder(plugin_path());
+
+        $activatedPlugins = array_diff($plugins, array_diff($plugins, $existingPlugins));
+
+        $activatedPlugins = array_values($activatedPlugins);
+
+        Cache::forever('core_installed_plugins', $activatedPlugins);
+
+        self::$activatedPlugins = $activatedPlugins;
+
+        return $activatedPlugins;
+    }
+
+    public static function getInstalledPlugins(): array
+    {
+        $list = [];
+
+        $plugins = BaseHelper::scanFolder(plugin_path());
+
+        if (! empty($plugins)) {
+            foreach ($plugins as $plugin) {
+                $path = plugin_path($plugin);
+                if (! File::isDirectory($path) || ! File::exists($path . '/plugin.json')) {
+                    continue;
+                }
+
+                $list[] = $plugin;
+            }
+        }
+
+        return $list;
     }
 }

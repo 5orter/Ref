@@ -107,7 +107,7 @@ class CartItem implements Arrayable, Jsonable
     public function updateFromArray(array $attributes): void
     {
         $this->id = Arr::get($attributes, 'id', $this->id);
-        $this->qty = Arr::get($attributes, 'qty', $this->qty);
+        $this->qty = Arr::get($attributes, 'qty', $this->qty) ?: 1;
         $this->name = Arr::get($attributes, 'name', $this->name);
         $this->price = Arr::get($attributes, 'price', $this->price);
         $this->priceTax = $this->price + $this->tax;

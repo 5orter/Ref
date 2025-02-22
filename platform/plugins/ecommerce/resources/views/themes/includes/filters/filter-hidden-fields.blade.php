@@ -3,6 +3,7 @@
         'layout',
         'page',
         'per-page',
+        'num',
         'sort-by',
         'collection',
     ] as $item)

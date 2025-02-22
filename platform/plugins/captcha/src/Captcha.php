@@ -42,9 +42,15 @@ class Captcha extends CaptchaContract
 
         $this->rendered = true;
 
+        $captchaContent = view('plugins/captcha::v2.html', ['name' => $name, 'siteKey' => $this->siteKey])->render();
+
+        if (request()->ajax()) {
+            $captchaContent .= $footerContent;
+        }
+
         return
             tap(
-                view('plugins/captcha::v2.html', ['name' => $name, 'siteKey' => $this->siteKey])->render(),
+                $captchaContent,
                 fn (string $rendered) => CaptchaRendered::dispatch($rendered)
             );
     }

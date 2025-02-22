@@ -21,10 +21,16 @@
             </div>
         @endif
 
-        <input id="rzp_order_id" type="hidden" value="{{ $orderId }}">
+        @if ($orderId)
+            <input id="rzp_order_id" type="hidden" value="{{ $orderId }}">
+        @endif
     </x-plugins-payment::payment-method>
 
-    @if ($paymentService->isValidToProcessCheckout())
+    @if ($paymentService->isValidToProcessCheckout() && get_payment_setting(
+                'payment_type',
+                RAZORPAY_PAYMENT_METHOD_NAME,
+                'hosted_checkout',
+            ) == 'website_embedded')
         <script>
             $(document).ready(function() {
 
@@ -100,6 +106,13 @@
                 $(document).off('click', '.payment-checkout-btn').on('click', '.payment-checkout-btn', function(event) {
                     event.preventDefault();
 
+                    let agreeTermsAndPolicy = $('#agree_terms_and_policy');
+
+                    if (agreeTermsAndPolicy.length && ! agreeTermsAndPolicy.is(':checked')) {
+                        alert('{{ __('Please agree to the terms and conditions before proceeding.') }}');
+                        return;
+                    }
+
                     var _self = $(this);
                     var form = _self.closest('form');
 
@@ -143,5 +156,7 @@
                 });
             });
         </script>
+
+        {!! apply_filters('razorpay_extra_script') !!}
     @endif
 @endif

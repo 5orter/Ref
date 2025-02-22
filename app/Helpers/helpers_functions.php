@@ -1,12 +1,10 @@
 <?php
 
-use App\Contracts\ClientAPI\Client;
+use App\Infrastructure\Services\ClientAPI\ClientService;
 
 if (!function_exists('client')) {
-    /**
-     * @return \App\Contracts\ClientAPI\Client
-     */
-    function client() {
-        return app(Client::class);
+    function client(array $config = []): ClientService
+    {
+        return new ClientService($config);
     }
 }

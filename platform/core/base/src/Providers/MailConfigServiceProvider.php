@@ -54,12 +54,9 @@ class MailConfigServiceProvider extends ServiceProvider
                         $config->set([
                             'mail.mailers.smtp' => array_merge($config->get('mail.mailers.smtp'), [
                                 'transport' => 'smtp',
+                                'schema' => $config->get('mail.mailers.smtp.schema'),
                                 'host' => $setting->get('email_host', $config->get('mail.mailers.smtp.host')),
                                 'port' => (int) $setting->get('email_port', $config->get('mail.mailers.smtp.port')),
-                                'encryption' => $setting->get(
-                                    'email_encryption',
-                                    $config->get('mail.mailers.smtp.encryption')
-                                ),
                                 'username' => $setting->get('email_username', $config->get('mail.mailers.smtp.username')),
                                 'password' => $setting->get('email_password', $config->get('mail.mailers.smtp.password')),
                                 'auth_mode' => null,

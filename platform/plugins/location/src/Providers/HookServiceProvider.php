@@ -32,8 +32,16 @@ class HookServiceProvider extends ServiceProvider
                 Assets::addScriptsDirectly('vendor/core/plugins/location/js/bulk-import.js');
                 $countries = Location::getAvailableCountries();
 
-                return $html . view('plugins/location::partials.import-available-data', compact('countries'));
-            }, 999, 2);
+                return $html . view('plugins/location::partials.import-available-data', compact('countries'))->render();
+            }, 980, 2);
+
+            add_filter('data_synchronize_import_form_after', function (?string $html, Importer $importer): ?string {
+                if (! $importer instanceof LocationImporter) {
+                    return $html;
+                }
+
+                return $html . view('plugins/location::partials.location-import-extra-fields')->render();
+            }, 990, 2);
         });
     }
 }

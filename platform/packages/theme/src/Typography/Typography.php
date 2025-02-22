@@ -124,7 +124,7 @@ class Typography
                 $value = $fontFamily->getDefault();
             }
 
-            if (! in_array($value, $renderedFonts)) {
+            if (! in_array($value, $renderedFonts) && $fontFamily->isGoogleFont()) {
                 $fontWeights = $fontFamily->getFontWeights() ?: ['300', '400', '500', '600', '700'];
 
                 $fontFaces .= BaseHelper::googleFonts('https://fonts.googleapis.com/' . sprintf(

@@ -2,12 +2,11 @@
 
 namespace Botble\Ecommerce\Http\Controllers;
 
-use Botble\Base\Events\BeforeEditContentEvent;
 use Botble\Base\Events\CreatedContentEvent;
-use Botble\Base\Events\DeletedContentEvent;
 use Botble\Base\Events\UpdatedContentEvent;
 use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\BaseHelper;
+use Botble\Base\Http\Actions\DeleteResourceAction;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Supports\Breadcrumb;
 use Botble\Ecommerce\Exports\TemplateShippingRuleItemExport;
@@ -102,8 +101,6 @@ class ShippingRuleItemController extends BaseController
          */
         $item = ShippingRuleItem::query()->findOrFail($id);
 
-        event(new BeforeEditContentEvent($request, $item));
-
         $title = trans('core/base::forms.edit_item', ['name' => $item->name_item]);
 
         if ($request->ajax()) {
@@ -149,14 +146,12 @@ class ShippingRuleItemController extends BaseController
             ->withUpdatedSuccessMessage();
     }
 
-    public function destroy(int|string $id, Request $request)
+    public function destroy(int|string $id)
     {
         try {
             $item = ShippingRuleItem::query()->findOrFail($id);
 
-            $item->delete();
-
-            event(new DeletedContentEvent(SHIPPING_RULE_ITEM_MODULE_SCREEN_NAME, $request, $item));
+            DeleteResourceAction::make($item);
 
             return $this
                 ->httpResponse()

@@ -95,7 +95,7 @@ class MarketplaceServiceProvider extends ServiceProvider
             ->loadAndPublishTranslations()
             ->loadAndPublishViews()
             ->publishAssets()
-            ->loadRoutes(['base', 'fronts']);
+            ->loadRoutes(['base', 'fronts', 'vendor']);
 
         if (defined('LANGUAGE_MODULE_SCREEN_NAME') && defined('LANGUAGE_ADVANCED_MODULE_SCREEN_NAME')) {
             LanguageAdvancedManager::registerModule(Store::class, [
@@ -192,21 +192,21 @@ class MarketplaceServiceProvider extends ServiceProvider
                     $dashboardMenu
                         ->registerItem([
                             'id' => 'cms-plugins-product-specification-groups',
-                            'priority' => 3,
+                            'priority' => 900,
                             'name' => __('Specification Groups'),
                             'url' => fn () => route('marketplace.vendor.specification-groups.index'),
                             'icon' => 'ti ti-table-options',
                         ])
                         ->registerItem([
                             'id' => 'cms-plugins-product-specification-attributes',
-                            'priority' => 3,
+                            'priority' => 910,
                             'name' => __('Specification Attributes'),
                             'url' => fn () => route('marketplace.vendor.specification-attributes.index'),
                             'icon' => 'ti ti-table-options',
                         ])
                         ->registerItem([
                             'id' => 'cms-plugins-product-specification-tables',
-                            'priority' => 3,
+                            'priority' => 920,
                             'name' => __('Specification Tables'),
                             'url' => fn () => route('marketplace.vendor.specification-tables.index'),
                             'icon' => 'ti ti-table-options',
@@ -242,7 +242,7 @@ class MarketplaceServiceProvider extends ServiceProvider
                 ])
                 ->registerItem([
                     'id' => 'marketplace.vendor.settings',
-                    'priority' => 7,
+                    'priority' => 999,
                     'name' => __('Settings'),
                     'url' => fn () => route('marketplace.vendor.settings'),
                     'icon' => 'ti ti-settings',
@@ -256,13 +256,6 @@ class MarketplaceServiceProvider extends ServiceProvider
                         'icon' => 'ti ti-messages',
                     ]);
                 })
-                ->registerItem([
-                    'id' => 'customer.overview',
-                    'priority' => 8,
-                    'name' => __('Customer dashboard'),
-                    'url' => fn () => route('customer.overview'),
-                    'icon' => 'ti ti-user',
-                ])
                 ->when(EcommerceHelper::isReviewEnabled(), function (DashboardMenuSupport $dashboardMenu) {
                     return $dashboardMenu->registerItem([
                         'id' => 'marketplace.vendor.reviews',

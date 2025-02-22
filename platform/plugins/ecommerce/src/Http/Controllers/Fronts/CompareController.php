@@ -19,10 +19,13 @@ class CompareController extends BaseController
 
     public function index()
     {
-        SeoHelper::setTitle(__('Compare'));
+        $title = __('Compare');
+
+        SeoHelper::setTitle(theme_option('ecommerce_compare_seo_title') ?: $title)
+            ->setDescription(theme_option('ecommerce_compare_seo_description'));
 
         Theme::breadcrumb()
-            ->add(__('Compare'), route('public.compare'));
+            ->add($title, route('public.compare'));
 
         $itemIds = collect(Cart::instance('compare')->content())
             ->sortBy([['updated_at', 'desc']])
@@ -30,9 +33,9 @@ class CompareController extends BaseController
 
         $products = collect();
         $attributeSets = collect();
-        if ($itemIds->count()) {
+        if ($itemIds->isNotEmpty()) {
             $products = $this->productRepository
-                ->getProductsByIds($itemIds->toArray(), array_merge([
+                ->getProductsByIds($itemIds->all(), array_merge([
                     'take' => 10,
                     'with' => EcommerceHelper::withProductEagerLoadingRelations(),
                 ], EcommerceHelper::withReviewsParams()));

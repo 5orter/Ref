@@ -21,6 +21,14 @@
                 <input type="text" class="form-control" v-model="product.sku" />
             </div>
         </div>
+        <div class="mb-3 position-relative">
+            <label class="form-label">{{ __('order.status') }}</label>
+            <select class="form-select" v-model="product.status">
+                <option value="published">{{ __('order.published') }}</option>
+                <option value="draft">{{ __('order.draft') }}</option>
+                <option value="pending">{{ __('order.pending') }}</option>
+            </select>
+        </div>
         <div :class="{ 'position-relative': true, 'mb-3': product.with_storehouse_management || store && store.id }">
             <label class="form-check">
                 <input
@@ -74,6 +82,7 @@ export default {
                 name: null,
                 price: 0,
                 sku: null,
+                status: 'published',
                 with_storehouse_management: false,
                 allow_checkout_when_out_of_stock: false,
                 quantity: 0,
@@ -83,6 +92,12 @@ export default {
     },
     mounted: function () {
         this.resetProductData()
+
+        $event.on(`ec-modal:open`, (id) => {
+            if (id === 'add-product-item') {
+                this.resetProductData()
+            }
+        })
     },
 }
 </script>

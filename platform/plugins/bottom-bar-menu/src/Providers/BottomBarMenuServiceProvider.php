@@ -3,6 +3,7 @@
 namespace Botble\BottomBarMenu\Providers;
 
 use Botble\Base\Traits\LoadAndPublishDataTrait;
+use Botble\Theme\Events\RenderingThemeOptionSettings;
 use Botble\Theme\Facades\Theme;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Facades\Event;
@@ -53,6 +54,46 @@ class BottomBarMenuServiceProvider extends ServiceProvider
 
                 return $html . view('plugins/bottom-bar-menu::menu')->render();
             }, 16);
+        });
+
+        $this->app['events']->listen(RenderingThemeOptionSettings::class, function () {
+            theme_option()
+                ->setSection([
+                    'title' => __('Bottom Bar Menu'),
+                    'id' => 'opt-text-subsection-bottom-bar-menu',
+                    'subsection' => true,
+                    'icon' => 'ti ti-category-2',
+                    'fields' => [
+                        [
+                            'id' => 'bottom_bar_menu_show_text',
+                            'type' => 'customSelect',
+                            'label' => __('Show menu text'),
+                            'attributes' => [
+                                'name' => 'bottom_bar_menu_show_text',
+                                'list' => [
+                                    'yes' => __('Yes'),
+                                    'no' => __('No'),
+                                ],
+                                'value' => 'yes',
+                                'options' => [
+                                    'class' => 'form-control',
+                                ],
+                            ],
+                        ],
+                        [
+                            'id' => 'bottom_bar_menu_text_font_size',
+                            'type' => 'number',
+                            'label' => __('Menu text font size'),
+                            'attributes' => [
+                                'name' => 'bottom_bar_menu_text_font_size',
+                                'value' => 12,
+                                'options' => [
+                                    'class' => 'form-control',
+                                ],
+                            ],
+                        ],
+                    ],
+                ]);
         });
     }
 }

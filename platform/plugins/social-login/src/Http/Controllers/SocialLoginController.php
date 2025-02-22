@@ -9,6 +9,7 @@ use Botble\Media\Facades\RvMedia;
 use Botble\SocialLogin\Facades\SocialService;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -170,6 +171,8 @@ class SocialLoginController extends BaseController
             $account->fill($data);
             $account->confirmed_at = Carbon::now();
             $account->save();
+
+            event(new Registered($account));
         }
 
         Auth::guard($guard)->login($account, true);

@@ -142,7 +142,6 @@ class HookServiceProvider extends ServiceProvider
 
         $checkoutUrl = $payPalService->execute($paymentData);
 
-dd($checkoutUrl);
         if ($checkoutUrl) {
             $data['checkoutUrl'] = $checkoutUrl;
         } else {

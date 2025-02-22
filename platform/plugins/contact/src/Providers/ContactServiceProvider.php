@@ -19,6 +19,7 @@ use Botble\Contact\Repositories\Interfaces\ContactInterface;
 use Botble\Contact\Repositories\Interfaces\ContactReplyInterface;
 use Botble\LanguageAdvanced\Supports\LanguageAdvancedManager;
 use Botble\Setting\PanelSections\SettingOthersPanelSection;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Events\RouteMatched;
 
 class ContactServiceProvider extends ServiceProvider
@@ -74,7 +75,7 @@ class ContactServiceProvider extends ServiceProvider
                         ->name('plugins/contact::contact.custom_field.name')
                         ->icon('ti ti-cube-plus')
                         ->route('contacts.custom-fields.index')
-                        ->permissions('contacts.edit')
+                        ->permissions('contact.custom-fields')
                 );
         });
 
@@ -106,10 +107,43 @@ class ContactServiceProvider extends ServiceProvider
 
             LanguageAdvancedManager::registerModule(CustomFieldOption::class, [
                 'label',
-                'value',
             ]);
 
             LanguageAdvancedManager::addTranslatableMetaBox('contact-custom-field-options');
+
+            add_action(LANGUAGE_ADVANCED_ACTION_SAVED, function ($data, $request): void {
+                if ($data::class == CustomField::class) {
+                    $customFieldOptions = $request->input('options', []) ?: [];
+
+                    if (! $customFieldOptions) {
+                        return;
+                    }
+
+                    $newRequest = new Request();
+
+                    $newRequest->replace([
+                        'language' => $request->input('language'),
+                        'ref_lang' => $request->input('ref_lang'),
+                    ]);
+
+                    foreach ($customFieldOptions as $option) {
+                        if (empty($option['id'])) {
+                            continue;
+                        }
+
+                        $customFieldOption = CustomFieldOption::query()->find($option['id']);
+
+                        if ($customFieldOption) {
+                            $newRequest->merge([
+                                'label' => $option['label'],
+                                'value' => null,
+                            ]);
+
+                            LanguageAdvancedManager::save($customFieldOption, $newRequest);
+                        }
+                    }
+                }
+            }, 1234, 2);
         }
     }
 }

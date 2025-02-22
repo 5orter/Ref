@@ -85,26 +85,31 @@
     /*---------------------
         Price range
     --------------------- */
-    if ($('.slider-range').length) {
-        $('.slider-range').map(function(i, el) {
-            const $this = $(el)
-            const $parent = $this.closest('.range')
-            const $min = $parent.find('input.min-range')
-            const $max = $parent.find('input.max-range')
-            $this.slider({
-                range: true,
-                min: $min.data('min') || 0,
-                max: $max.data('max') || 500,
-                values: [$min.val() || 0, $max.val() || 500],
-                slide: function(event, ui) {
-                    setInputRange($parent, ui.values[0], ui.values[1])
-                },
-                change: function(event, ui) {
-                    setInputRange($parent, ui.values[0], ui.values[1])
-                },
+    let initPriceFilter = function() {
+        if ($('.slider-range').length) {
+            $('.slider-range').map(function(i, el) {
+                const $this = $(el)
+                const $parent = $this.closest('.range')
+                const $min = $parent.find('input.min-range')
+                const $max = $parent.find('input.max-range')
+                $this.slider({
+                    range: true,
+                    min: $min.data('min') || 0,
+                    max: $max.data('max') || 500,
+                    values: [$min.val() || 0, $max.val() || 500],
+                    slide: function(event, ui) {
+                        setInputRange($parent, ui.values[0], ui.values[1])
+                    },
+                    change: function(event, ui) {
+                        setInputRange($parent, ui.values[0], ui.values[1])
+
+                        $parent.find('input.min-range').trigger('change')
+                        $parent.find('input.max-range').trigger('change')
+                    },
+                })
+                setInputRange($parent, $this.slider('values', 0), $this.slider('values', 1))
             })
-            setInputRange($parent, $this.slider('values', 0), $this.slider('values', 1))
-        })
+        }
     }
 
     function setInputRange($parent, min, max) {
@@ -122,6 +127,8 @@
         $from.text(minFormatted)
         $to.text(maxFormatted)
     }
+
+    initPriceFilter()
 
     /*------ Hero slider 1 ----*/
     $('.hero-slider-1').slick({
@@ -974,6 +981,10 @@
                 800,
             )
         })
+    })
+
+    document.addEventListener('ecommerce.product-filter.success', (e) => {
+        initPriceFilter()
     })
 
 })(jQuery)

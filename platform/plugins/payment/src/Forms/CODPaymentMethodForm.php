@@ -11,7 +11,7 @@ use Botble\Base\Forms\FormAbstract;
 use Botble\Payment\Concerns\Forms\HasAvailableCountriesField;
 use Botble\Payment\Enums\PaymentMethodEnum;
 
-class CODPaymentMethodForm extends FormAbstract
+class CODPaymentMethodForm extends PaymentMethodForm
 {
     use HasAvailableCountriesField;
 
@@ -46,6 +46,7 @@ class CODPaymentMethodForm extends FormAbstract
                     ->label(trans('plugins/payment::payment.payment_method_description'))
                     ->value(get_payment_setting('description', PaymentMethodEnum::COD))
             )
+            ->paymentMethodLogoField(PaymentMethodEnum::COD)
             ->addAvailableCountriesField(PaymentMethodEnum::COD)
             ->when(
                 apply_filters(PAYMENT_METHOD_SETTINGS_CONTENT, null, PaymentMethodEnum::COD),

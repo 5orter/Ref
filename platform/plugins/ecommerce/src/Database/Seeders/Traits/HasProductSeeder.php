@@ -64,12 +64,15 @@ trait HasProductSeeder
         $faker = $this->fake();
 
         $categoryIds = ProductCategory::query()->pluck('id');
+        $categoriesCount = $categoryIds->count();
         $tagIds = ProductTag::query()->pluck('id');
+        $tagsCount = $tagIds->count();
         $collectionIds = ProductCollection::query()->pluck('id');
         $labelIds = ProductLabel::query()->pluck('id');
         $taxIds = Tax::query()->pluck('id');
         $brandIds = Brand::query()->pluck('id');
         $faqIds = is_plugin_active('faq') ? Faq::query()->pluck('id') : collect();
+        $faqsCount = $faqIds->count();
 
         $insertedProducts = collect();
 
@@ -133,12 +136,12 @@ trait HasProductSeeder
                 $product->productLabels()->sync([$labelIds->random()]);
             }
 
-            if ($categoryIds->isNotEmpty()) {
-                $product->categories()->sync($categoryIds->random($categoryIds->count() > 4 ? 4 : 1)->toArray());
+            if ($categoriesCount) {
+                $product->categories()->sync($categoryIds->random($categoriesCount > 4 ? 4 : 1)->all());
             }
 
-            if ($tagIds->isNotEmpty()) {
-                $product->tags()->sync($tagIds->random($tagIds->count() > 3 ? 3 : 1)->toArray());
+            if ($tagsCount) {
+                $product->tags()->sync($tagIds->random($tagsCount > 3 ? 3 : 1)->all());
             }
 
             if ($taxIds->isNotEmpty()) {
@@ -153,7 +156,7 @@ trait HasProductSeeder
                 MetaBox::saveMetaBoxData(
                     $product,
                     'faq_ids',
-                    $faqIds->random($faqIds->count() >= 5 ? 5 : 1)->toArray()
+                    $faqIds->random($faqsCount >= 5 ? 5 : 1)->all()
                 );
             }
         }

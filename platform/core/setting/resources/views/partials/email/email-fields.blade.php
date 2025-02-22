@@ -40,14 +40,6 @@
     />
 
     <x-core::form.text-input
-        name="email_encryption"
-        :label="trans('core/setting::setting.email.encryption')"
-        data-counter="20"
-        :value="old('email_encryption', setting('email_encryption', config('mail.mailers.smtp.encryption')))"
-        :placeholder="trans('core/setting::setting.email.encryption_placeholder')"
-    />
-
-    <x-core::form.text-input
         name="email_local_domain"
         :label="trans('core/setting::setting.email.local_domain')"
         data-counter="20"

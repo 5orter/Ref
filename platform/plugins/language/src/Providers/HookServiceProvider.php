@@ -84,6 +84,50 @@ class HookServiceProvider extends ServiceProvider
 
             return $flag;
         }, 50, 2);
+
+        add_filter('core_default_language', function (array $defaultLanguage) {
+            $default = Language::getDefaultLanguage();
+
+            if (! $default) {
+                return $defaultLanguage;
+            }
+
+            return [
+                'locale' => $default->lang_locale,
+                'code' => $default->lang_code,
+                'name' => $default->lang_name,
+                'flag' => $default->lang_flag,
+                'is_rtl' => $default->lang_is_rtl,
+            ];
+        }, 50);
+
+        add_filter('core_available_locales', function (array $availableLocales) {
+            $languages = Language::getActiveLanguage(['lang_locale', 'lang_code', 'lang_name', 'lang_flag', 'lang_is_rtl']);
+
+            if ($languages->isEmpty()) {
+                return $availableLocales;
+            }
+
+            $availableLocales = [];
+
+            foreach ($languages as $language) {
+                $key = $language->lang_locale;
+
+                if (isset($availableLocales[$key])) {
+                    $key = $language->lang_code;
+                }
+
+                $availableLocales[$key] = [
+                    'locale' => $language->lang_locale,
+                    'code' => $language->lang_code,
+                    'name' => $language->lang_name,
+                    'flag' => $language->lang_flag,
+                    'is_rtl' => $language->lang_is_rtl,
+                ];
+            }
+
+            return $availableLocales;
+        }, 50);
     }
 
     public function settingEmailTemplateMetaBoxes(?string $data, array $params = []): string

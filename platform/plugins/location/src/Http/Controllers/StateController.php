@@ -106,7 +106,12 @@ class StateController extends BaseController
         $countryId = $request->input('country_id');
 
         if ($countryId && $countryId != 'null') {
-            $data = $data->where('country_id', $countryId);
+            $data = $data
+                ->whereHas('country', function ($query) use ($countryId): void {
+                    $query
+                        ->where('id', $countryId)
+                        ->orWhere('code', $countryId);
+                });
         }
 
         $data = $data->get();

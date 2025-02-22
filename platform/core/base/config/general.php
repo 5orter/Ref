@@ -337,6 +337,9 @@ return [
                 'table',
                 'tbody',
                 'td',
+                'dl',
+                'dt',
+                'dd',
                 'th',
                 'thead',
                 'tr',
@@ -369,7 +372,6 @@ return [
             'HTML.SafeIframe' => 'true',
             // Add to .env if you want to allow all.
             // CMS_IFRAME_FILTER_URL_REGEX=/^(.*)/
-            'URI.SafeIframeRegexp' => env('CMS_IFRAME_FILTER_URL_REGEX', '%^(http://|https://|//)(' . env('CMS_IFRAME_ALLOWED_URLS', 'www.youtube.com/embed/|player.vimeo.com/video/|maps.google.com/maps|www.google.com/maps|docs.google.com/|drive.google.com/|view.officeapps.live.com/op/embed.aspx|onedrive.live.com/embed') . ')%'),
             'Attr.AllowedFrameTargets' => ['_blank'],
             'CSS.AllowedProperties' => [
                 'font',
@@ -466,4 +468,7 @@ return [
     'google_fonts_key' => env('CMS_GOOGLE_FONTS_KEY'),
     'demo_mode_enabled' => env('CMS_DEMO_MODE_ENABLED', false),
     'enable_email_configuration_from_admin_panel' => env('CMS_ENABLE_EMAIL_CONFIGURATION_FROM_ADMIN_PANEL', true),
+    'session_cookie' => env('CMS_SESSION_COOKIE_KEY_NAME', 'botble_session'),
+    'allowed_iframe_urls' => env('CMS_IFRAME_ALLOWED_URLS', ''),
+    'iframe_regex' => env('CMS_IFRAME_FILTER_URL_REGEX', ''),
 ];

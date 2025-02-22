@@ -16,6 +16,7 @@ class BaseStatusEnum extends Enum
     public const PUBLISHED = 'published';
     public const DRAFT = 'draft';
     public const PENDING = 'pending';
+
     public static $langPath = 'core/base::enums.statuses';
 
     public function toHtml(): string|HtmlString

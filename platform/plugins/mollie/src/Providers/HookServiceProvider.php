@@ -116,7 +116,7 @@ class HookServiceProvider extends ServiceProvider
                 ],
                 'description' => $paymentData['description'],
                 'redirectUrl' => PaymentHelper::getRedirectURL(),
-                'webhookUrl' => route('mollie.payment.callback'),
+                'webhookUrl' => route('mollie.payment.callback', $paymentData['checkout_token']),
                 'metadata' => [
                     'order_id' => $paymentData['order_id'],
                     'customer_id' => $paymentData['customer_id'],

@@ -8,14 +8,19 @@
     ]);
     $oldOption = old('options', []) ?? [];
     $currentProductOption = $product->options;
-    foreach ($currentProductOption as $key => $option) {
-        $currentProductOption[$key]['name'] = $option->name;
-        foreach ($option['values'] as $valueKey => $value) {
-            $currentProductOption[$key]['values'][$valueKey]['option_value'] = $value->option_value;
+    if (! empty($currentProductOption) && $currentProductOption instanceof ArrayAccess) {
+        foreach ($currentProductOption as $key => $option) {
+            $currentProductOption[$key]['name'] = $option->name;
+
+            if ($option['values'] && is_array($option['values'])) {
+                foreach ($option['values'] as $valueKey => $value) {
+                    $currentProductOption[$key]['values'][$valueKey]['option_value'] = $value->option_value;
+                }
+            }
         }
     }
 
-    if (!empty($oldOption)) {
+    if (! empty($oldOption)) {
         $currentProductOption = $oldOption;
     }
 
@@ -156,7 +161,7 @@
                     </select>
                 </td>
                 <td class="align-middle" style="width: 50px;">
-                    <button class="btn btn-default remove-row"><x-core::icon name="ti ti-trash" /></button>
+                    <button class="btn btn-default remove-row" type="button"><x-core::icon name="ti ti-trash" /></button>
                 </td>
             @endif
         </tr>

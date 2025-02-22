@@ -24,7 +24,7 @@
             --color-danger: {{ theme_option('color_danger', '#FD6E6E') }};
             --color-success: {{ theme_option('color_success', '#81B13D') }};
             --color-info: {{ theme_option('color_info', '#2cc1d8') }};
-            --color-text: {{ theme_option('color_text', '#7E7E7E') }};
+            --color-text: {{ theme_option('color_text', '#4c4c4c') }};
             --color-heading: {{ theme_option('color_heading', '#253D4E') }};
             --color-grey-1: {{ theme_option('color_grey_1', '#253D4E') }};
             --color-grey-2: {{ theme_option('color_grey_2', '#242424') }};
@@ -90,7 +90,7 @@
                                     @if (count($headerMessage) == 4)
                                         <li @if (!$loop->first) style="display: none" @endif>
                                             @if ($headerMessage[0]['value'])
-                                                <i class="{{ $headerMessage[0]['value'] }} d-inline-block mr-5"></i>&nbsp;
+                                                {!! BaseHelper::renderIcon($headerMessage[0]['value'], null, ['class' => 'd-inline-block mr-5']) !!}
                                             @endif
 
                                             @if ($headerMessage[1]['value'])
@@ -253,27 +253,35 @@
                 @if (is_plugin_active('ecommerce') && theme_option('enabled_browse_categories_on_header', 'yes') == 'yes')
                     <div class="main-categories-wrap d-none d-lg-block">
                         <a class="categories-button-active" href="#">
-                            <span class="fi-rs-apps"></span> {!! BaseHelper::clean(__('<span class="et">Browse</span> All Categories')) !!}
+                            <span class="fi-rs-apps"></span> {!! BaseHelper::clean(__('All Categories')) !!}
                             <i class="fi-rs-angle-down"></i>
                         </a>
                         <div class="categories-dropdown-wrap categories-dropdown-active-large font-heading">
-                            @php
-                                $categories = ProductCategoryHelper::getProductCategoriesWithUrl([], ['is_featured' => true]);
-                            @endphp
-
                             <div class="d-flex categories-dropdown-inner">
-                                {!! Theme::partial('product-categories-dropdown', ['categories' => $categories, 'more' => false]) !!}
+                                {!!
+                                    Theme::partial('product-root-categories-dropdown', [
+                                        'categories' => ProductCategoryHelper::getRootCategories()
+                                    ])
+                                !!}
                             </div>
-                            @if (count($categories) > 10)
-                                <div class="more_slide_open" style="display: none">
-                                    <div class="d-flex categories-dropdown-inner">
-                                        {!! Theme::partial('product-categories-dropdown', ['categories' => $categories, 'more' => true]) !!}
-                                    </div>
+                            @php
+                                /*
+                                    $categories = ProductCategoryHelper::getProductCategoriesWithUrl([], ['is_featured' => true]);
+                                <div class="d-flex categories-dropdown-inner">
+                                    {!! Theme::partial('product-categories-dropdown', ['categories' => $categories, 'more' => false]) !!}
                                 </div>
-                            @endif
-                            @if (count($categories) > 10)
-                                <div class="more_categories" data-text-show-more="{{ __('Show more...') }}" data-text-show-less="{{ __('Show less...') }}"><span class="icon"></span> <span class="heading-sm-1">{{ __('Show more...') }}</span></div>
-                            @endif
+                                @if (count($categories) > 10)
+                                    <div class="more_slide_open" style="display: none">
+                                        <div class="d-flex categories-dropdown-inner">
+                                            {!! Theme::partial('product-categories-dropdown', ['categories' => $categories, 'more' => true]) !!}
+                                        </div>
+                                    </div>
+                                @endif
+                                @if (count($categories) > 10)
+                                    <div class="more_categories" data-text-show-more="{{ __('Show more...') }}" data-text-show-less="{{ __('Show less...') }}"><span class="icon"></span> <span class="heading-sm-1">{{ __('Show more...') }}</span></div>
+                                @endif
+                                */
+                            @endphp
                         </div>
                     </div>
                 @endif
@@ -291,7 +299,7 @@
             @if (theme_option('hotline'))
                 <div class="hotline d-none d-lg-flex">
                     <img src="{{ Theme::asset()->url('imgs/theme/icons/icon-headphone.svg') }}" alt="hotline" />
-                    <p>{{ theme_option('hotline') }}<span>{{ __('24/7 Support Center') }}</span></p>
+                    <p>{{ theme_option('hotline') }}<span>{{ theme_option('hotline_subtitle_text') ?: __('24/7 Support Center') }}</span></p>
                 </div>
             @endif
             <div class="header-action-icon-2 d-block d-lg-none">

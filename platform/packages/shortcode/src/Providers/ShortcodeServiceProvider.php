@@ -56,6 +56,8 @@ class ShortcodeServiceProvider extends ServiceProvider
             ->publishAssets();
 
         $this->app->booted(function (): void {
+            $this->loadRoutes(['fronts']);
+
             add_filter(BASE_FILTER_FORM_EDITOR_BUTTONS, function (?string $buttons, array $attributes, string $id) {
                 if (! $this->hasWithShortcode($attributes)) {
                     return $buttons;

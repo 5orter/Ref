@@ -75,6 +75,19 @@ return [
                 'product_list' => 'plugins/ecommerce::ecommerce.product_list',
             ],
         ],
+        'order_cancellation_to_admin' => [
+            'title' => 'plugins/ecommerce::email.order_cancellation_to_admin_title',
+            'description' => 'plugins/ecommerce::email.order_cancellation_to_admin_description',
+            'subject' => 'plugins/ecommerce::email.order_cancellation_to_admin_subject',
+            'can_off' => true,
+            'enabled' => false,
+            'variables' => [
+                'customer_name' => 'plugins/ecommerce::ecommerce.customer_name',
+                'order_id' => 'plugins/ecommerce::ecommerce.order_id',
+                'cancellation_reason' => 'plugins/ecommerce::order.order_cancellation_reason',
+                'product_list' => 'plugins/ecommerce::ecommerce.product_list',
+            ],
+        ],
         ...(! setting('ecommerce_disable_physical_product') ? [
             'customer_delivery_order' => [
                 'title' => 'plugins/ecommerce::email.delivery_confirmation_title',

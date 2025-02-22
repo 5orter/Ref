@@ -53,7 +53,6 @@ return [
     'hide_languages_helper_display_hidden' => '{0} All languages are currently displayed.|{1} :language is currently hidden to visitors.|[2, Inf] :language are currently hidden to visitors.',
     'show_all' => 'Show all',
     'change_language' => 'Language',
-    'language_show_default_item_if_current_version_not_existed' => 'Show item in default language if it is not existed in current language',
     'select_flag' => 'Select a flag...',
     'delete_confirmation_message' => 'Do you really want to delete this language? It also deletes all items in this language and cannot rollback!',
     'added_already' => 'This language was added already!',

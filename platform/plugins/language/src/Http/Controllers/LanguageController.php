@@ -14,6 +14,9 @@ use Botble\Language\Http\Requests\LanguageRequest;
 use Botble\Language\LanguageManager;
 use Botble\Language\Models\Language as LanguageModel;
 use Botble\Language\Models\LanguageMeta;
+use Botble\Menu\Models\Menu;
+use Botble\Menu\Models\MenuLocation;
+use Botble\Menu\Models\MenuNode;
 use Botble\Setting\Facades\Setting;
 use Botble\Setting\Http\Controllers\SettingController;
 use Botble\Theme\Facades\Theme;
@@ -80,34 +83,15 @@ class LanguageController extends SettingController
 
             $locale = $request->input('lang_locale');
 
-            if (! File::isDirectory(lang_path($locale))) {
-                $importedLocale = false;
-
-                if (is_plugin_active('translation')) {
-                    $result = app(Manager::class)->downloadRemoteLocale($locale);
-
-                    $importedLocale = ! $result['error'];
-                }
-
-                if (! $importedLocale) {
-                    $defaultLocale = lang_path('en');
-                    if (File::exists($defaultLocale)) {
-                        File::copyDirectory($defaultLocale, lang_path($locale));
-                    }
-
-                    $this->createLocaleInPath(lang_path('vendor/core'), $locale);
-                    $this->createLocaleInPath(lang_path('vendor/packages'), $locale);
-                    $this->createLocaleInPath(lang_path('vendor/plugins'), $locale);
-
-                    $this->copyThemeLangFiles($locale);
-                }
-            }
+            $this->importLocaleIfMissing($locale);
 
             $language = LanguageModel::query()->create($request->except('lang_id'));
 
             $this->clearRoutesCache();
 
             event(new CreatedContentEvent(LANGUAGE_MODULE_SCREEN_NAME, $request, $language));
+
+            $this->cloneMenusToLanguage($language);
 
             try {
                 $models = $languageManager->supportedModels();
@@ -118,7 +102,8 @@ class LanguageController extends SettingController
                             continue;
                         }
 
-                        $ids = LanguageMeta::query()->where('reference_type', $model)
+                        $ids = LanguageMeta::query()
+                            ->where('reference_type', $model)
                             ->pluck('reference_id')
                             ->all();
 
@@ -161,6 +146,36 @@ class LanguageController extends SettingController
         }
     }
 
+    protected function importLocaleIfMissing(string $locale): bool
+    {
+        if (File::isDirectory(lang_path($locale))) {
+            return false;
+        }
+
+        $importedLocale = false;
+
+        if (is_plugin_active('translation')) {
+            $result = app(Manager::class)->downloadRemoteLocale($locale);
+
+            $importedLocale = ! $result['error'];
+        }
+
+        if (! $importedLocale) {
+            $defaultLocale = lang_path('en');
+            if (File::exists($defaultLocale)) {
+                File::copyDirectory($defaultLocale, lang_path($locale));
+            }
+
+            $this->createLocaleInPath(lang_path('vendor/core'), $locale);
+            $this->createLocaleInPath(lang_path('vendor/packages'), $locale);
+            $this->createLocaleInPath(lang_path('vendor/plugins'), $locale);
+
+            $this->copyThemeLangFiles($locale);
+        }
+
+        return $importedLocale;
+    }
+
     public function update(Request $request)
     {
         try {
@@ -169,6 +184,10 @@ class LanguageController extends SettingController
 
             $language->fill($request->input());
             $language->save();
+
+            $locale = $request->input('lang_locale');
+
+            $this->importLocaleIfMissing($locale);
 
             $this->clearRoutesCache();
 
@@ -466,5 +485,58 @@ class LanguageController extends SettingController
         }
 
         File::copy($themeLocalePath, lang_path($locale . '.json'));
+    }
+
+    protected function cloneMenusToLanguage(LanguageModel $language): void
+    {
+        $menus = Menu::query()
+            ->with(['menuNodes', 'locations'])
+            ->join('language_meta', 'language_meta.reference_id', '=', 'menus.id')
+            ->where('language_meta.reference_type', Menu::class)
+            ->where('language_meta.lang_meta_code', LanguageFacade::getDefaultLocaleCode())
+            ->select('menus.*')
+            ->get();
+
+        foreach ($menus as $menu) {
+            /**
+             * @var Menu $menuItem
+             */
+            $menuItem = $menu->replicate();
+            $menuItem->slug = $menu->slug . '-' . $language->lang_code;
+            $menuItem->save();
+
+            $originValue = LanguageMeta::query()
+                ->where('reference_id', $menu->id)
+                ->where('reference_type', Menu::class)
+                ->value('lang_meta_origin');
+
+            LanguageMeta::saveMetaData($menuItem, $language->lang_code, $originValue);
+
+            foreach ($menu->locations as $location) {
+                $menuLocationItem = $location->replicate();
+                $menuLocationItem->menu_id = $menuItem->getKey();
+                $menuLocationItem->save();
+
+                $originValue = LanguageMeta::query()
+                    ->where('reference_id', $location->id)
+                    ->where('reference_type', MenuLocation::class)
+                    ->value('lang_meta_origin');
+
+                LanguageMeta::saveMetaData($menuLocationItem, $language->lang_code, $originValue);
+            }
+
+            foreach ($menu->menuNodes as $menuNode) {
+                $menuNodeItem = $menuNode->replicate();
+                $menuNodeItem->menu_id = $menuItem->getKey();
+                $menuNodeItem->save();
+
+                $originValue = LanguageMeta::query()
+                    ->where('reference_id', $menuNode->id)
+                    ->where('reference_type', MenuNode::class)
+                    ->value('lang_meta_origin');
+
+                LanguageMeta::saveMetaData($menuNodeItem, $language->lang_code, $originValue);
+            }
+        }
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Botble\Payment\Forms;
 
+use Botble\Base\Forms\FieldOptions\MediaImageFieldOption;
+use Botble\Base\Forms\Fields\MediaImageField;
 use Botble\Base\Forms\FormAbstract;
 use Illuminate\Support\HtmlString;
 
@@ -9,9 +11,7 @@ class PaymentMethodForm extends FormAbstract
 {
     public function setup(): void
     {
-        $this
-            ->contentOnly()
-            ->template('plugins/payment::forms.payment-method');
+        $this->template('plugins/payment::forms.payment-method');
     }
 
     protected function paymentId(string $id): static
@@ -61,6 +61,18 @@ class PaymentMethodForm extends FormAbstract
         $this->setFormOption('default_description_value', $value);
 
         return $this;
+    }
+
+    protected function paymentMethodLogoField(string $name): static
+    {
+        return $this
+            ->add(
+                get_payment_setting_key('logo', $name),
+                MediaImageField::class,
+                MediaImageFieldOption::make()
+                    ->label(trans('plugins/payment::payment.method_logo'))
+                    ->value(get_payment_setting('logo', $name))
+            );
     }
 
     public function getPaymentInstructions(): HtmlString

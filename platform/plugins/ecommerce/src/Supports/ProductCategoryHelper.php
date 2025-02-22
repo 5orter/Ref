@@ -12,7 +12,6 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 
 class ProductCategoryHelper
@@ -20,6 +19,58 @@ class ProductCategoryHelper
     protected Collection $allCategories;
 
     protected Collection $treeCategories;
+
+    public function getRootCategories(): Collection
+    {
+        $cache = Cache::make(ProductCategory::class);
+
+        $cacheKey = 'ecommerce_root_categories_for_widgets_' . md5($cache->generateCacheKeyFromInput() . serialize(func_get_args()));
+
+        if ($cache->has($cacheKey)) {
+            return $cache->get($cacheKey);
+        }
+
+        $tablePrefix = Schema::getConnection()->getTablePrefix();
+        $query = ProductCategory::query()
+            ->toBase()
+            ->where('status', BaseStatusEnum::PUBLISHED)
+            ->where('parent_id', 0)
+            ->where('show', 1);
+
+        $query->select([
+            'parent_id',
+            'ec_product_categories.id',
+            'ec_product_categories.name',
+            DB::raw("CONCAT({$tablePrefix}slugs.prefix, '/', {$tablePrefix}slugs.key) as url")
+        ])
+            ->leftJoin('slugs', function (JoinClause $join): void {
+                $join
+                    ->on('slugs.reference_id', 'ec_product_categories.id')
+                    ->where('slugs.reference_type', ProductCategory::class);
+            })
+            ->when($this->isEnabledMultiLanguages(), function (Builder $query): void {
+                $query
+                    ->leftJoin('slugs_translations as st', function (JoinClause $join): void {
+                        $join
+                            ->on('st.slugs_id', 'slugs.id')
+                            ->where('st.lang_code', Language::getCurrentLocaleCode());
+                    })
+                    ->addSelect(
+                        DB::raw(
+                            "IF(st.key IS NOT NULL, CONCAT(st.prefix, '/', st.key), CONCAT(slugs.prefix, '/', slugs.key)) as url"
+                        )
+                    );
+            })
+            ->orderBy('ec_product_categories.order', 'ASC');
+
+        $query = $this->applyQuery($query);
+
+        $categories = $query->get()->unique('id');
+
+        $cache->put($cacheKey, $categories, Carbon::now()->addHours(2));
+
+        return $categories;
+    }
 
     public function getAllProductCategories(array $params = [], bool $onlyParent = false): Collection
     {
@@ -176,19 +227,14 @@ class ProductCategoryHelper
         $cacheKey = 'ecommerce_categories_for_widgets_' . md5($cache->generateCacheKeyFromInput() . serialize(func_get_args()));
 
         if ($cache->has($cacheKey)) {
-           return $cache->get($cacheKey);
+            return $cache->get($cacheKey);
         }
 
         $tablePrefix = Schema::getConnection()->getTablePrefix();
         $query = ProductCategory::query()
             ->toBase()
-            ->where('status', BaseStatusEnum::PUBLISHED);
-
-            if( Route::currentRouteName() === 'public.index' ) {
-                $query->where('show', ProductCategory::SHOW_STATUSES['show']);
-            }
-
-        $query->select([
+            ->where('status', BaseStatusEnum::PUBLISHED)
+            ->select([
                 'ec_product_categories.id',
                 'ec_product_categories.name',
                 'ec_product_categories.order',

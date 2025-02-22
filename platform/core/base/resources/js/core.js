@@ -820,6 +820,7 @@ class Botble {
                 || text.includes('</a>')
                 || text.includes(' href=')
                 || text.includes('target="_blank"')
+                || text.includes('<img src="')
             ) {
                 return text
             }

@@ -97,6 +97,10 @@ return [
     'payment_proof' => 'Payment proof',
     'print_invoice' => 'Print invoice',
     'add_note' => 'Add note...',
+    'note_description' => '(from customer at the checkout page)',
+    'add_note_helper' => 'Note about order, ex: time or shipping instruction. This note is added by customer at the checkout page, you should not change it.',
+    'admin_private_notes' => 'Private notes',
+    'admin_private_notes_helper' => 'Note for admin/manager about this order. This note is added by admin/manager, customer cannot see it.',
     'order_was_confirmed' => 'Order was confirmed',
     'confirm_order' => 'Confirm order',
     'confirm' => 'Confirm',
@@ -363,4 +367,7 @@ return [
     ],
 
     'edit_email' => 'Edit email',
+    'export_title' => 'Orders',
+    'export_description' => 'Export orders to a CSV file',
+    'download' => 'Download',
 ];

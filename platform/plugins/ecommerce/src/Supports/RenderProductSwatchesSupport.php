@@ -33,7 +33,7 @@ class RenderProductSwatchesSupport
 
         $product = $this->product;
 
-        $attributeSets = $product->productAttributeSets()->orderBy('order')->get();
+        $attributeSets = $product->productAttributeSets()->orderBy('order')->latest()->get();
 
         $attributes = $this->productRepository->getRelatedProductAttributes($this->product)->sortBy('order');
 

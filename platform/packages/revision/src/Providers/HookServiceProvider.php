@@ -2,6 +2,7 @@
 
 namespace Botble\Revision\Providers;
 
+use Botble\Base\Facades\AdminHelper;
 use Botble\Base\Facades\Assets;
 use Botble\Base\Forms\FormAbstract;
 use Botble\Base\Forms\FormTab;
@@ -20,6 +21,7 @@ class HookServiceProvider extends ServiceProvider
                 ! $model instanceof BaseModel
                 || ! $model->exists
                 || ! $this->isSupported($model)
+                || ! AdminHelper::isInAdmin(true)
             ) {
                 return;
             }

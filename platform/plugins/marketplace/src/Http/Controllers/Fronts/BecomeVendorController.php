@@ -28,6 +28,17 @@ class BecomeVendorController extends BaseController
 
             return $next($request);
         });
+
+        $version = get_cms_version();
+
+        Theme::asset()
+            ->add('customer-style', 'vendor/core/plugins/ecommerce/css/customer.css', ['bootstrap-css'], version: $version);
+
+        Theme::asset()
+            ->container('footer')
+            ->add('ecommerce-utilities-js', 'vendor/core/plugins/ecommerce/js/utilities.js', ['jquery'], version: $version)
+            ->add('cropper-js', 'vendor/core/plugins/ecommerce/libraries/cropper.js', ['jquery'], version: $version)
+            ->add('avatar-js', 'vendor/core/plugins/ecommerce/js/avatar.js', ['jquery'], version: $version);
     }
 
     public function index()

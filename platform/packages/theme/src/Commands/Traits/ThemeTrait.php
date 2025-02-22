@@ -17,10 +17,16 @@ trait ThemeTrait
         return rtrim($rootPath, '/') . '/' . rtrim(ltrim(strtolower($theme), '/'), '/') . '/' . $path;
     }
 
-    protected function getTheme(): string
+    protected function getTheme(): ?string
     {
         if ($this->hasArgument('name')) {
-            return strtolower($this->argument('name'));
+            $name = $this->argument('name');
+
+            if (! $name) {
+                return $name;
+            }
+
+            return strtolower($name);
         }
 
         return Theme::getThemeName();

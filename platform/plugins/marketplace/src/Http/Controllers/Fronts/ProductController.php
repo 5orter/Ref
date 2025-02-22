@@ -6,6 +6,7 @@ use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Events\CreatedContentEvent;
 use Botble\Base\Facades\EmailHandler;
 use Botble\Base\Http\Controllers\BaseController;
+use Botble\Base\Rules\MediaImageRule;
 use Botble\Ecommerce\Enums\ProductTypeEnum;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Requests\DeleteProductVariationsRequest;
@@ -27,7 +28,9 @@ use Botble\Marketplace\Facades\MarketplaceHelper;
 use Botble\Marketplace\Forms\ProductForm;
 use Botble\Marketplace\Tables\ProductTable;
 use Botble\Marketplace\Tables\ProductVariationTable;
+use Botble\Media\Facades\RvMedia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class ProductController extends BaseController
 {
@@ -45,7 +48,7 @@ class ProductController extends BaseController
         return $table->renderTable();
     }
 
-    public function create(Request $request)
+    public function create()
     {
         if (EcommerceHelper::getCurrentCreationContextProductType() == ProductTypeEnum::DIGITAL) {
             $this->pageTitle(trans('plugins/ecommerce::products.create_product_type.digital'));
@@ -64,6 +67,8 @@ class ProductController extends BaseController
         StoreAttributesOfProductService $storeAttributesOfProductService,
         StoreProductTagService $storeProductTagService
     ) {
+        $request->merge(['video_media' => $this->uploadVideoMedia($request)]);
+
         $request = $this->processRequestData($request);
 
         $product = new Product();
@@ -172,6 +177,8 @@ class ProductController extends BaseController
         $product = Product::query()->findOrFail($id);
 
         abort_if($product->is_variation || $product->store->id != auth('customer')->user()->store->id, 404);
+
+        $request->merge(['video_media' => $this->uploadVideoMedia($request)]);
 
         $request = $this->processRequestData($request);
 
@@ -457,5 +464,49 @@ class ProductController extends BaseController
         return $this
             ->httpResponse()
             ->withUpdatedSuccessMessage();
+    }
+
+    protected function uploadVideoMedia(ProductRequest $request)
+    {
+        $imageRules = [];
+
+        foreach ($request->allFiles() as $key => $file) {
+            if (! str_starts_with($key, 'video_media___')) {
+                continue;
+            }
+
+            $imageRules[$key] = ['nullable', new MediaImageRule()];
+        }
+
+        if ($imageRules) {
+            $request->validate($imageRules);
+        }
+
+        /**
+         * @var Customer $customer
+         */
+        $customer = auth('customer')->user();
+
+        $uploadFolder = $customer->upload_folder;
+
+        $videoMedias = $request->input('video_media');
+
+        foreach ($request->allFiles() as $key => $file) {
+            if (! str_starts_with($key, 'video_media___')) {
+                continue;
+            }
+
+            $result = RvMedia::handleUpload($file, 0, $uploadFolder);
+
+            if (! $result['error']) {
+                $key = str_replace('video_media___', '', $key);
+                $key = str_replace('_input', '', $key);
+                $key = str_replace('___', '.', $key);
+
+                Arr::set($videoMedias, $key, $result['data']->url);
+            }
+        }
+
+        return $videoMedias;
     }
 }

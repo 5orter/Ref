@@ -9,7 +9,7 @@ class Ecommerce {
                 const currentTarget = $(e.currentTarget)
 
                 currentTarget.toggleClass('active')
-                currentTarget.closest('.bb-product-filter-item').find('> .bb-product-filter-items').slideToggle()
+                currentTarget.closest('.bb-product-filter-item').find('> .bb-product-filter-items').slideToggle().toggleClass('active')
             })
             .on('click', '[data-bb-toggle="toggle-filter-sidebar"]', () => {
                 $('.bb-filter-offcanvas-area').toggleClass('offcanvas-opened')
@@ -52,7 +52,7 @@ class Ecommerce {
                 this.#ajaxSearchProducts($(e.currentTarget).closest('form'))
             })
             .on('click', 'body', (e) => {
-                if (!$(e.target).closest('.bb-form-quick-s4earch').length) {
+                if (!$(e.target).closest('.bb-form-quick-search').length) {
                     $('.bb-quick-search-results').removeClass('show').html('')
                 }
             })
@@ -520,6 +520,18 @@ class Ecommerce {
                     complete: () => currentTarget.prop('disabled', false).removeClass('btn-loading'),
                 })
             })
+            .on('change', '[data-bb-toggle="product-form-filter-item"]', (e) => {
+                const currentTarget = $(e.currentTarget)
+
+                const $form = $('.bb-product-form-filter')
+
+                const $input = $form.find(`input[name="${currentTarget.prop('name')}"]`)
+
+                if ($input.length) {
+                    $input.val(currentTarget.val())
+                    $form.trigger('submit')
+                }
+            })
 
         if ($('.bb-product-price-filter').length) {
             this.initPriceFilter()
@@ -744,7 +756,7 @@ class Ecommerce {
             throw new Error('jQuery UI slider is required for price filter')
         }
 
-        const $priceFilter = $('.bb-product-price-filter')
+        const $priceFilter = $(document).find('.bb-product-price-filter')
         const $sliderRange = $priceFilter.find('.price-slider')
         const $rangeLabel = $priceFilter.find('.input-range-label')
 
@@ -874,6 +886,10 @@ class Ecommerce {
                 } else {
                     results.html(data)
                 }
+
+                if (typeof Theme.lazyLoadInstance !== 'undefined') {
+                    Theme.lazyLoadInstance.update()
+                }
             },
             complete: () => button.removeClass('btn-loading'),
         })
@@ -915,6 +931,10 @@ class Ecommerce {
                         },
                     })
                 )
+
+                if ($('.bb-product-price-filter').length) {
+                    EcommerceApp.initPriceFilter()
+                }
             },
             error: (error) => Theme.handleError(error),
             complete: () => {
@@ -935,27 +955,46 @@ class Ecommerce {
 
     #initCategoriesDropdown = async () => {
         const makeRequest = (url, beforeCallback, successCallback) => {
-            $.ajax({
-                url,
+            // Assuming url, beforeCallback, successCallback, and Theme.handleError are already defined
+
+            // Call the beforeSend callback
+            beforeCallback();
+
+            fetch(url, {
                 method: 'GET',
-                beforeSend: () => beforeCallback(),
-                success: ({ error, data }) => {
+                headers: {
+                    'Content-Type': 'application/json', // Requesting JSON response
+                    'Accept': 'application/json' // Requesting JSON response
+                }
+            })
+                .then(response => {
+                    // Check if the response is okay and parse it as JSON
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(({ error, data }) => {
                     if (error) {
-                        return
+                        return;
                     }
 
-                    successCallback(data)
+                    // Call the success callback with the data
+                    successCallback(data);
 
+                    // Dispatch a custom event after successfully fetching the data
                     document.dispatchEvent(
                         new CustomEvent('ecommerce.categories-dropdown.success', {
                             detail: {
                                 data,
                             },
                         })
-                    )
-                },
-                error: (error) => Theme.handleError(error),
-            })
+                    );
+                })
+                .catch(error => {
+                    // Handle any errors that occur during the fetch
+                    Theme.handleError(error);
+                });
         }
 
         const initCategoriesDropdown = $(document).find('[data-bb-toggle="init-categories-dropdown"]')
@@ -975,6 +1014,10 @@ class Ecommerce {
                             target.html(data.dropdown)
                         } else {
                             currentTarget.append(data.select)
+                        }
+
+                        if (typeof Theme.lazyLoadInstance !== 'undefined') {
+                            Theme.lazyLoadInstance.update()
                         }
                     })
                 }
@@ -1022,141 +1065,145 @@ class Ecommerce {
     }
 
     onChangeProductAttribute = () => {
-        /**
-         * @param {Array<Number>} data
-         * @param {jQuery} element
-         */
-        window.onBeforeChangeSwatches = (data, element) => {
-            const form = element.closest('form')
+        if (! window.onBeforeChangeSwatches || typeof window.onBeforeChangeSwatches !== 'function') {
+            /**
+             * @param {Array<Number>} data
+             * @param {jQuery} element
+             */
+            window.onBeforeChangeSwatches = (data, element) => {
+                const form = element.closest('form')
 
-            if (data) {
-                form.find('button[type="submit"]').prop('disabled', true)
-                form.find('button[data-bb-toggle="add-to-cart"]').prop('disabled', true)
+                if (data) {
+                    form.find('button[type="submit"]').prop('disabled', true)
+                    form.find('button[data-bb-toggle="add-to-cart"]').prop('disabled', true)
+                }
             }
         }
 
-        /**
-         * @param {{data: Object, error: Boolean, message: String}} response
-         * @param {jQuery} element
-         */
-        window.onChangeSwatchesSuccess = (response, element) => {
-            if (!response) {
-                return
-            }
+        if (! window.onChangeSwatchesSuccess || typeof window.onChangeSwatchesSuccess !== 'function') {
+            /**
+             * @param {{data: Object, error: Boolean, message: String}} response
+             * @param {jQuery} element
+             */
+            window.onChangeSwatchesSuccess = (response, element) => {
+                if (!response) {
+                    return
+                }
 
-            const $product = $('.bb-product-detail')
-            const $form = element.closest('form')
-            const $button = $form.find('button[type="submit"]')
-            const $quantity = $form.find('input[name="qty"]')
-            const $available = $product.find('.number-items-available')
-            const $sku = $product.find('[data-bb-value="product-sku"]')
+                const $product = $('.bb-product-detail')
+                const $form = element.closest('form')
+                const $button = $form.find('button[type="submit"]')
+                const $quantity = $form.find('input[name="qty"]')
+                const $available = $product.find('.number-items-available')
+                const $sku = $product.find('[data-bb-value="product-sku"]')
 
-            const { error, data } = response
+                const { error, data } = response
 
-            if (error) {
-                $button.prop('disabled', true)
-                $quantity.prop('disabled', true)
+                if (error) {
+                    $button.prop('disabled', true)
+                    $quantity.prop('disabled', true)
 
-                $form.find('input[name="id"]').val('')
+                    $form.find('input[name="id"]').val('')
 
-                return
-            }
+                    return
+                }
 
-            $button.prop('disabled', false)
-            $quantity.prop('disabled', false)
-            $form.find('input[name="id"]').val(data.id)
+                $button.prop('disabled', false)
+                $quantity.prop('disabled', false)
+                $form.find('input[name="id"]').val(data.id)
 
-            $product.find('[data-bb-value="product-price"]').text(data.display_sale_price)
+                $product.find('[data-bb-value="product-price"]').text(data.display_sale_price)
 
-            if (data.sale_price !== data.price) {
-                $product.find('[data-bb-value="product-original-price"]').text(data.display_price).show()
-            } else {
-                $product.find('[data-bb-value="product-original-price"]').hide()
-            }
+                if (data.sale_price !== data.price) {
+                    $product.find('[data-bb-value="product-original-price"]').text(data.display_price).show()
+                } else {
+                    $product.find('[data-bb-value="product-original-price"]').hide()
+                }
 
-            if (data.sku) {
-                $sku.text(data.sku)
-                $sku.closest('div').show()
-            } else {
-                $sku.closest('div').hide()
-            }
+                if (data.sku) {
+                    $sku.text(data.sku)
+                    $sku.closest('div').show()
+                } else {
+                    $sku.closest('div').hide()
+                }
 
-            if (data.error_message) {
-                $button.prop('disabled', true)
-                $quantity.prop('disabled', true)
+                if (data.error_message) {
+                    $button.prop('disabled', true)
+                    $quantity.prop('disabled', true)
 
-                $available.html(`<span class="text-danger">${data.error_message}</span>`).show()
-            }  else if (data.warning_message) {
-                $available.html(`<span class="text-warning fw-medium fs-6">${data.warning_message}</span>`).show()
-            } else if (data.success_message) {
-                $available.html(`<span class="text-success">${data.success_message}</span>`).show()
-            } else {
-                $available.html('').hide()
-            }
+                    $available.html(`<span class='text-danger'>${data.error_message}</span>`).show()
+                } else if (data.warning_message) {
+                    $available.html(`<span class='text-warning fw-medium fs-6'>${data.warning_message}</span>`).show()
+                } else if (data.success_message) {
+                    $available.html(`<span class='text-success'>${data.success_message}</span>`).show()
+                } else {
+                    $available.html('').hide()
+                }
 
-            $product.find('.bb-product-attribute-swatch-item').removeClass('disabled')
-            $product.find('.bb-product-attribute-swatch-list select option').prop('disabled', false)
+                $product.find('.bb-product-attribute-swatch-item').removeClass('disabled')
+                $product.find('.bb-product-attribute-swatch-list select option').prop('disabled', false)
 
-            const unavailableAttributeIds = data.unavailable_attribute_ids || []
+                const unavailableAttributeIds = data.unavailable_attribute_ids || []
 
-            if (unavailableAttributeIds.length) {
-                unavailableAttributeIds.map((id) => {
-                    let $swatchItem = $product.find(`.bb-product-attribute-swatch-item[data-id="${id}"]`)
-
-                    if ($swatchItem.length) {
-                        $swatchItem.addClass('disabled')
-                        $swatchItem.find('input').prop('checked', false)
-                    } else {
-                        $swatchItem = $product.find(`.bb-product-attribute-swatch-list select option[data-id="${id}"]`)
+                if (unavailableAttributeIds.length) {
+                    unavailableAttributeIds.map((id) => {
+                        let $swatchItem = $product.find(`.bb-product-attribute-swatch-item[data-id="${id}"]`)
 
                         if ($swatchItem.length) {
-                            $swatchItem.prop('disabled', true)
+                            $swatchItem.addClass('disabled')
+                            $swatchItem.find('input').prop('checked', false)
+                        } else {
+                            $swatchItem = $product.find(`.bb-product-attribute-swatch-list select option[data-id="${id}"]`)
+
+                            if ($swatchItem.length) {
+                                $swatchItem.prop('disabled', true)
+                            }
                         }
-                    }
-                })
-            }
+                    })
+                }
 
-            let imageHtml = ''
-            let thumbHtml = ''
+                let imageHtml = ''
+                let thumbHtml = ''
 
-            if (!data.image_with_sizes.origin.length) {
-                data.image_with_sizes.origin.push(siteConfig.img_placeholder)
-            } else {
-                data.image_with_sizes.origin.forEach(function (item) {
-                    imageHtml += `
-                    <a href="${item}">
-                        <img src="${item}" alt="${data.name}">
+                if (!data.image_with_sizes.origin.length) {
+                    data.image_with_sizes.origin.push(siteConfig.img_placeholder)
+                } else {
+                    data.image_with_sizes.origin.forEach(function(item) {
+                        imageHtml += `
+                    <a href='${item}'>
+                        <img src='${item}' alt='${data.name}'>
                     </a>
                 `
-                })
-            }
+                    })
+                }
 
-            if (!data.image_with_sizes.thumb.length) {
-                data.image_with_sizes.thumb.push(siteConfig.img_placeholder)
-            } else {
-                data.image_with_sizes.thumb.forEach(function (item) {
-                    thumbHtml += `
+                if (!data.image_with_sizes.thumb.length) {
+                    data.image_with_sizes.thumb.push(siteConfig.img_placeholder)
+                } else {
+                    data.image_with_sizes.thumb.forEach(function(item) {
+                        thumbHtml += `
                     <div>
-                        <img src="${item}" alt="${data.name}">
+                        <img src='${item}' alt='${data.name}'>
                     </div>
                 `
-                })
-            }
+                    })
+                }
 
-            const $galleryImages = $product.find('.bb-product-gallery')
+                const $galleryImages = $product.find('.bb-product-gallery')
 
-            $galleryImages.find('.bb-product-gallery-thumbnails').slick('unslick').html(thumbHtml)
+                $galleryImages.find('.bb-product-gallery-thumbnails').slick('unslick').html(thumbHtml)
 
-            const $quickViewGalleryImages = $(document).find('.bb-quick-view-gallery-images')
+                const $quickViewGalleryImages = $(document).find('.bb-quick-view-gallery-images')
 
-            if ($quickViewGalleryImages.length) {
-                $quickViewGalleryImages.slick('unslick').html(imageHtml)
-            }
+                if ($quickViewGalleryImages.length) {
+                    $quickViewGalleryImages.slick('unslick').html(imageHtml)
+                }
 
-            $galleryImages.find('.bb-product-gallery-images').slick('unslick').html(imageHtml)
+                $galleryImages.find('.bb-product-gallery-images').slick('unslick').html(imageHtml)
 
-            if (typeof EcommerceApp !== 'undefined') {
-                EcommerceApp.initProductGallery()
+                if (typeof EcommerceApp !== 'undefined') {
+                    EcommerceApp.initProductGallery()
+                }
             }
         }
     }
@@ -1234,27 +1281,51 @@ $(() => {
     })
 
     document.addEventListener('ecommerce.product-filter.before', () => {
-        $('[data-bb-toggle="product-list"]')
-            .find('.bb-product-items-wrapper')
-            .append('<div class="loading-spinner"></div>')
+        let $wrapper = $('[data-bb-toggle="product-list"]')
+            .find('.bb-product-items-wrapper');
+
+        if ($wrapper.length) {
+            $wrapper.append('<div class="loading-spinner"></div>')
+        }
     })
 
     document.addEventListener('ecommerce.product-filter.success', (e) => {
         const { data } = e.detail
 
-        $('.bb-product-items-wrapper').html(data.data)
+        const $productItemsWrapper = $('.bb-product-items-wrapper')
 
-        if (data.additional) {
-            $('.bb-shop-sidebar').replaceWith(data.additional.filters_html)
+        if ($productItemsWrapper.length) {
+            $productItemsWrapper.html(data.data)
         }
 
-        if ($('.bb-product-price-filter').length) {
+        if (data.additional) {
+            const $defaultSidebar = $('.bb-shop-sidebar')
+
+            let $sidebar = $('[data-bb-filter-sidebar]')
+
+            if (! $sidebar.length) {
+                $sidebar = $defaultSidebar
+            }
+
+            $sidebar.replaceWith(data.additional.filters_html)
+        }
+
+        if ($(document).find('.bb-product-price-filter').length) {
             EcommerceApp.initPriceFilter()
         }
 
-        $('html, body').animate({
-            scrollTop: $('.bb-product-items-wrapper').offset().top - 120,
-        })
+        if ($productItemsWrapper.length) {
+            $('html, body').animate({
+                scrollTop: $productItemsWrapper.offset().top - 120,
+            })
+        }
+
+        let $wrapper = $('[data-bb-toggle="product-list"]')
+            .find('.bb-product-items-wrapper');
+
+        if ($wrapper.length) {
+            $wrapper.find('.loading-spinner').remove()
+        }
     })
 
     document.addEventListener('ecommerce.product-filter.completed', () => {

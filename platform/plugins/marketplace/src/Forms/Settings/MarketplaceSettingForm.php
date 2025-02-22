@@ -4,13 +4,16 @@ namespace Botble\Marketplace\Forms\Settings;
 
 use Botble\Base\Facades\Assets;
 use Botble\Base\Forms\FieldOptions\CheckboxFieldOption;
+use Botble\Base\Forms\FieldOptions\MultiChecklistFieldOption;
 use Botble\Base\Forms\FieldOptions\NumberFieldOption;
 use Botble\Base\Forms\FieldOptions\OnOffFieldOption;
+use Botble\Base\Forms\Fields\MultiCheckListField;
 use Botble\Base\Forms\Fields\NumberField;
 use Botble\Base\Forms\Fields\OnOffCheckboxField;
 use Botble\Marketplace\Facades\MarketplaceHelper;
 use Botble\Marketplace\Http\Requests\MarketPlaceSettingFormRequest;
 use Botble\Marketplace\Models\Store;
+use Botble\Media\Facades\RvMedia;
 use Botble\Setting\Forms\SettingForm;
 
 class MarketplaceSettingForm extends SettingForm
@@ -31,6 +34,9 @@ class MarketplaceSettingForm extends SettingForm
         if (MarketplaceHelper::isCommissionCategoryFeeBasedEnabled()) {
             $commissionEachCategory = Store::getCommissionEachCategory();
         }
+
+        $allowedMimeTypes = RvMedia::getConfig('allowed_mime_types');
+        $allowedMimeTypes = explode(',', $allowedMimeTypes);
 
         $this
             ->setSectionTitle(trans('plugins/marketplace::marketplace.settings.title'))
@@ -95,6 +101,15 @@ class MarketplaceSettingForm extends SettingForm
                     'step' => 1,
                 ],
             ])
+            ->add(
+                'media_mime_types_allowed[]',
+                MultiCheckListField::class,
+                MultiChecklistFieldOption::make()
+                    ->label(trans('plugins/marketplace::marketplace.settings.media_file_types_can_be_uploaded_by_vendor'))
+                    ->helperText(trans('plugins/marketplace::marketplace.settings.media_file_types_can_be_uploaded_by_vendor_helper'))
+                    ->choices(array_combine($allowedMimeTypes, $allowedMimeTypes))
+                    ->selected(MarketplaceHelper::mediaMimeTypesAllowed())
+            )
             ->add(
                 'enabled_vendor_registration',
                 OnOffCheckboxField::class,

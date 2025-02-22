@@ -41,7 +41,7 @@
             </tr>
             <tr>
                 <td class="bb-content bb-text-center">
-                    <div>We're excited to see your store flourish on {{ site_name }}!</div>
+                    <div>We're excited to see your store flourish on {{ site_title }}!</div>
                 </td>
             </tr>
         </tbody>

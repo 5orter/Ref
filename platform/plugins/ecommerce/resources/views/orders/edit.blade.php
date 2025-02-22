@@ -176,7 +176,7 @@
 
                             @if(! EcommerceHelper::isDisabledPhysicalProduct())
                                 @if (! $order->shipment->id)
-                                    <div class="shipment-create-wrap" style="display: none;"></div>
+                                    <div class="p-3 shipment-create-wrap" style="display: none;"></div>
                                 @else
                                     @include('plugins/ecommerce::orders.shipment-detail', [
                                         'shipment' => $order->shipment,
@@ -411,7 +411,7 @@
                             @if ($userInfo->id)
                                 <p class="mb-1">
                                     <x-core::icon name="ti ti-inbox" />
-                                    {{ $userInfo->orders()->count() }}
+                                    {{ $userInfo->completedOrders()->count() }}
                                     {{ trans('plugins/ecommerce::order.orders') }}
                                 </p>
                             @endif

@@ -121,7 +121,8 @@
                     </x-core::table.body.cell>
                     <x-core::table.body.cell>
                         <a href="{{ route('orders.download-proof', $order->id) }}" target="_blank">
-                            {{ $order->proof_file }}
+                            <span>{{ trans('plugins/ecommerce::order.download') }}</span>
+                            <x-core::icon name="ti ti-download" />
                         </a>
                     </x-core::table.body.cell>
                 </x-core::table.body.row>

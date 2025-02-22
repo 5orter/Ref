@@ -476,6 +476,15 @@ class RvMedia
             }
         }
 
+        $extraValidation = apply_filters('core_media_extra_validation', [], $fileUpload);
+
+        if ($extraValidation && Arr::get($extraValidation, 'error')) {
+            return [
+                'error' => true,
+                'message' => $extraValidation['message'],
+            ];
+        }
+
         try {
             $fileExtension = $fileUpload->getClientOriginalExtension() ?: $fileUpload->guessExtension();
 
@@ -993,7 +1002,7 @@ class RvMedia
 
     public function isChunkUploadEnabled(): bool
     {
-        return (int) $this->getConfig('chunk.enabled') == 1;
+        return (bool) setting('media_chunk_enabled', (int) $this->getConfig('chunk.enabled') == 1);
     }
 
     public function getConfig(?string $key = null, string|null|array $default = null)
@@ -1215,7 +1224,7 @@ class RvMedia
             ...$attributes,
         ];
 
-        if (Str::startsWith($url, ['data:image/png;base64,', 'data:image/jpeg;base64,', 'http://', 'https://'])) {
+        if (Str::startsWith($url, ['data:image/png;base64,', 'data:image/jpeg;base64,', 'data:image/jpg;base64,'])) {
             return Html::tag('img', '', [...$attributes, 'src' => $url, 'alt' => $alt]);
         }
 

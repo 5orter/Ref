@@ -37,7 +37,8 @@ class CategoryRepository extends RepositoriesAbstract implements CategoryInterfa
                 'description',
                 'icon',
             ])
-            ->oldest('order')->latest()
+            ->oldest('order')
+            ->latest()
             ->limit($limit);
 
         return $this->applyBeforeExecuteQuery($data)->get();
@@ -52,8 +53,8 @@ class CategoryRepository extends RepositoriesAbstract implements CategoryInterfa
 
         $data = $data
             ->wherePublished()
-            ->orderBy('order')
-            ->orderByDesc('created_at');
+            ->oldest('order')
+            ->latest();
 
         if ($with) {
             $data = $data->with($with);
@@ -142,7 +143,8 @@ class CategoryRepository extends RepositoriesAbstract implements CategoryInterfa
             ->with($with)
             ->withCount($withCount)
             ->orderByDesc('posts_count')
-            ->oldest('order')->latest()
+            ->oldest('order')
+            ->latest()
             ->wherePublished()
             ->limit($limit);
 

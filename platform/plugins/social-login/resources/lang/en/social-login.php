@@ -16,6 +16,8 @@ return [
             'app_id' => 'App ID',
             'app_secret' => 'App Secret',
             'helper' => 'Please go to https://console.developers.google.com/apis/dashboard to create new app update App ID, App Secret. Callback URL is :callback',
+            'use_google_button' => 'Use Google button',
+            'use_google_button_helper' => 'If you enable this option, the Google button will be used instead of the default button.',
         ],
         'github' => [
             'enable' => 'Enable GitHub login',

@@ -107,7 +107,7 @@ app()->booted(function (): void {
                 ->whereIn('id', $flashSaleIds)
                 ->get();
 
-            if (!$flashSales->count()) {
+            if (! $flashSales->count()) {
                 return null;
             }
 
@@ -154,7 +154,7 @@ app()->booted(function (): void {
                     ->first();
             }
 
-            if (!$flashSalePopup || !$flashSalePopup->products->count()) {
+            if (! $flashSalePopup || ! $flashSalePopup->products->count()) {
                 return null;
             }
 
@@ -188,7 +188,7 @@ app()->booted(function (): void {
                     return null;
                 }
 
-                $limit = (int)$shortcode->limit ?: 8;
+                $limit = (int) $shortcode->limit ?: 8;
 
                 $products = get_products_by_collections(array_merge([
                     'collections' => [
@@ -199,7 +199,7 @@ app()->booted(function (): void {
                     'with' => EcommerceHelper::withProductEagerLoadingRelations(),
                 ], EcommerceHelper::withReviewsParams()));
 
-                $perRow = (int)$shortcode->per_row > 0 ? (int)$shortcode->per_row : 4;
+                $perRow = (int) $shortcode->per_row > 0 ? (int) $shortcode->per_row : 4;
 
                 return Theme::partial('shortcodes.ecommerce.product-collections', [
                     'title' => $shortcode->title,
@@ -227,7 +227,7 @@ app()->booted(function (): void {
                     ])
                     ->first();
 
-                if (!$category) {
+                if (! $category) {
                     return null;
                 }
 
@@ -237,7 +237,7 @@ app()->booted(function (): void {
                     },
                 ]);
 
-                $limit = (int)$shortcode->limit ?: 8;
+                $limit = (int) $shortcode->limit ?: 8;
 
                 $products = app(ProductInterface::class)->getProductsByCategories(array_merge([
                     'categories' => [
@@ -247,7 +247,7 @@ app()->booted(function (): void {
                     'take' => $limit,
                 ], EcommerceHelper::withReviewsParams()));
 
-                $perRow = (int)$shortcode->per_row > 0 ? (int)$shortcode->per_row : 4;
+                $perRow = (int) $shortcode->per_row > 0 ? (int) $shortcode->per_row : 4;
 
                 return Theme::partial(
                     'shortcodes.ecommerce.product-category-products',
@@ -289,7 +289,7 @@ app()->booted(function (): void {
 
                 $categoryIds = array_filter(explode(',', $shortcode->categories));
 
-                if (!empty($categoryIds)) {
+                if (! empty($categoryIds)) {
                     $params['condition'][] = ['ec_product_categories.id', 'IN', $categoryIds];
                 }
 
@@ -449,7 +449,7 @@ app()->booted(function (): void {
                     ->with(array_merge(['metadata'], EcommerceHelper::withProductEagerLoadingRelations()))
                     ->orderBy('ec_products.created_at', 'DESC')
                     ->orderBy('ec_products.order', 'ASC')
-                    ->limit((int)$shortcode->limit ?: 8)
+                    ->limit((int) $shortcode->limit ?: 8)
                     ->select('ec_products.*')
                     ->distinct();
 
@@ -476,12 +476,43 @@ app()->booted(function (): void {
             __('Trending products'),
             __('Trending products'),
             function (Shortcode $shortcode) {
-                return Theme::partial('shortcodes.ecommerce.trending-products', compact('shortcode'));
+                $products = get_trending_products([
+                        'take' => (int) $shortcode->limit ?: 10,
+                        'with' => ['slugable'],
+                    ] + EcommerceHelper::withReviewsParams());
+
+                if ($products->isEmpty()) {
+                    return null;
+                }
+
+                return Theme::partial('shortcodes.ecommerce.trending-products', compact('shortcode', 'products'));
             }
         );
 
         shortcode()->setAdminConfig('trending-products', function (array $attributes) {
             return Theme::partial('shortcodes.ecommerce.trending-products-admin-config', compact('attributes'));
+        });
+
+        add_shortcode(
+            'featured-products',
+            __('Featured products'),
+            __('Featured products'),
+            function (Shortcode $shortcode) {
+                $products = get_featured_products([
+                        'take' => (int) $shortcode->limit ?: 10,
+                        'with' => ['slugable'],
+                    ] + EcommerceHelper::withReviewsParams());
+
+                if ($products->isEmpty()) {
+                    return null;
+                }
+
+                return Theme::partial('shortcodes.ecommerce.featured-products', compact('shortcode', 'products'));
+            }
+        );
+
+        shortcode()->setAdminConfig('featured-products', function (array $attributes) {
+            return Theme::partial('shortcodes.ecommerce.featured-products-admin-config', compact('attributes'));
         });
     }
 
@@ -505,18 +536,17 @@ app()->booted(function (): void {
 
         function display_ad(
             BaseModel|string $ads,
-            string           $class = '',
+            string $class = '',
                              $loop = null,
-            ?Shortcode       $shortcode = null
-        ): ?string
-        {
-            if (!($ads instanceof BaseModel)) {
+            ?Shortcode $shortcode = null
+        ): ?string {
+            if (! ($ads instanceof BaseModel)) {
                 $ads = AdsManager::getData()
                     ->where('key', $ads)
                     ->first();
             }
 
-            if (!$ads || !$ads->image) {
+            if (! $ads || ! $ads->image) {
                 return null;
             }
 

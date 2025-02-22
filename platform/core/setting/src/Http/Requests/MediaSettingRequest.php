@@ -93,6 +93,7 @@ class MediaSettingRequest extends Request
             'media_image_max_height' => ['nullable', 'numeric', 'min:200'],
             'media_customize_upload_path' => [$onOffRule],
             'media_upload_path' => ['required', 'string', 'max:255'],
+            'media_convert_file_name_to_uuid' => [$onOffRule],
         ];
 
         foreach (array_keys(RvMedia::getSizes()) as $size) {

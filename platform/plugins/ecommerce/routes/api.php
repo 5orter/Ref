@@ -2,9 +2,13 @@
 
 use Botble\Ecommerce\Http\Controllers\API\AddressController;
 use Botble\Ecommerce\Http\Controllers\API\BrandController;
+use Botble\Ecommerce\Http\Controllers\API\CartController;
+use Botble\Ecommerce\Http\Controllers\API\CheckoutController;
+use Botble\Ecommerce\Http\Controllers\API\CountryController;
 use Botble\Ecommerce\Http\Controllers\API\OrderController;
 use Botble\Ecommerce\Http\Controllers\API\ProductCategoryController;
 use Botble\Ecommerce\Http\Controllers\API\ProductController;
+use Botble\Ecommerce\Http\Controllers\API\TaxController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -27,6 +31,24 @@ Route::group([
 
     Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('orders', [OrderController::class, 'index']);
+        Route::get('orders/{id}', [OrderController::class, 'show']);
         Route::get('addresses', [AddressController::class, 'index']);
+        Route::post('addresses', [AddressController::class, 'store']);
+        Route::put('addresses/{id}', [AddressController::class, 'update']);
+        Route::delete('addresses/{id}', [AddressController::class, 'destroy']);
+    });
+
+    Route::post('cart', [CartController::class, 'store']);
+    Route::put('cart/{id}', [CartController::class, 'update']);
+    Route::delete('cart/{id}', [CartController::class, 'destroy']);
+    Route::get('cart/{id}', [CartController::class, 'index']);
+
+    Route::post('cart/refresh', [CartController::class, 'refresh']);
+    Route::get('countries', [CountryController::class, 'index']);
+
+    Route::post('checkout/taxes/calculate', TaxController::class);
+
+    Route::group(['middleware' => ['web', 'core']], function (): void {
+        Route::get('checkout/cart/{id}', [CheckoutController::class, 'process']);
     });
 });

@@ -37,6 +37,9 @@ class PublicProductController extends BaseController
                 ->setNextUrl(route('public.products'));
         }
 
+        SeoHelper::setTitle(theme_option('ecommerce_products_seo_title') ?: __('Products'))
+            ->setDescription(theme_option('ecommerce_products_seo_description'));
+
         $with = EcommerceHelper::withProductEagerLoadingRelations();
 
         if (($query = BaseHelper::stringify($request->input('q'))) && ! $request->ajax()) {
@@ -47,7 +50,8 @@ class PublicProductController extends BaseController
             Theme::breadcrumb()
                 ->add(__('Search'), route('public.products'));
 
-            SeoHelper::meta()->setUrl(route('public.products'));
+            SeoHelper::meta()
+                ->setUrl(route('public.products'));
 
             return Theme::scope(
                 'ecommerce.search',
@@ -63,8 +67,6 @@ class PublicProductController extends BaseController
         if ($request->ajax()) {
             return $this->ajaxFilterProductsResponse($products);
         }
-
-        SeoHelper::setTitle(__('Products'))->setDescription(__('Products'));
 
         do_action(PRODUCT_MODULE_SCREEN_NAME);
 
@@ -160,7 +162,7 @@ class PublicProductController extends BaseController
                 ) == 'variation_images_and_main_product_images') {
                     $parentImages = is_array($product->original_images) ? $product->original_images : (array) json_decode($product->original_images, true);
 
-                    if ($parentImages && is_array($parentImages)) {
+                    if ($parentImages) {
                         $originalImages = array_merge($originalImages, $parentImages);
                     }
                 }
@@ -351,7 +353,8 @@ class PublicProductController extends BaseController
             $title = __('Order tracking :code', ['code' => $code]);
         }
 
-        SeoHelper::setTitle($title);
+        SeoHelper::setTitle(theme_option('ecommerce_order_tracking_seo_title') ?: $title)
+            ->setDescription(theme_option('ecommerce_order_tracking_seo_description'));
 
         Theme::breadcrumb()
             ->add($title, route('public.orders.tracking'));

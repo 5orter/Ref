@@ -38,6 +38,9 @@ return [
         'contact_store_subject' => 'New Customer Contact Message',
         'vendor_account_blocked_subject' => 'Your vendor account at {{ site_title }} has been blocked',
         'vendor_account_unblocked_subject' => 'Your vendor account at {{ site_title }} has been unblocked',
+        'order_cancellation_to_vendor_title' => 'Order cancellation (will be sent to seller (vendor)',
+        'order_cancellation_to_vendor_description' => 'Send to seller (vendor) when customer cancels an order',
+        'order_cancellation_to_vendor_subject' => 'Order :order_id has been cancelled by customer',
         'store' => 'Store',
         'order' => 'Order',
         'shipment' => 'Shipment info',
@@ -99,6 +102,8 @@ return [
         'single_vendor_checkout_help' => 'If enabled, customers can only purchase products from one vendor per order.',
         'display_order_total_info_for_each_store' => 'Display order total info for each store',
         'display_order_total_info_for_each_store_helper' => 'If enabled, the order total information will be displayed for each store in the order summary.',
+        'media_file_types_can_be_uploaded_by_vendor' => 'Media file types can be uploaded by vendor',
+        'media_file_types_can_be_uploaded_by_vendor_helper' => 'Specify the media file types that vendors can upload. Select them in the above list.',
     ],
     'theme_options' => [
         'name' => 'Marketplace',

@@ -45,7 +45,7 @@ class UpdateProductStockStatus
             }
 
             if (! $product->isOutOfStock()) {
-                $stockStatus = StockStatusEnum::IN_STOCK;
+                $stockStatus = $product->stock_status == StockStatusEnum::ON_BACKORDER ? StockStatusEnum::ON_BACKORDER : StockStatusEnum::IN_STOCK;
             }
         }
 

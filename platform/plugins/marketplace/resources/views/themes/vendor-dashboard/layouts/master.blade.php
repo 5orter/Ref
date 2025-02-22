@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html {!! Theme::htmlAttributes() !!} }>
-
+<html {!! Theme::htmlAttributes() !!}>
 <head>
     <meta charset="utf-8">
     <meta
@@ -66,7 +65,7 @@
     @stack('header')
 </head>
 
-<body {!! Theme::bodyAttributes() !!}>
+<body @if (session('locale_direction', 'ltr') == 'rtl') dir="rtl" @endif>
 
 @yield('body', view(MarketplaceHelper::viewPath('vendor-dashboard.layouts.body')))
 

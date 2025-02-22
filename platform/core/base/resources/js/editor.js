@@ -322,6 +322,7 @@ class EditorManagement {
                     this.uploadImageFromEditor(e.target.files[0], callback)
                 })
             },
+            directionality: $('body').prop('dir') || 'ltr',
         }
 
         if (localStorage.getItem('themeMode') === 'dark') {

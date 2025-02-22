@@ -80,7 +80,11 @@ class MediaSettingController extends SettingController
             return $this
                 ->httpResponse()
                 ->setError()
-                ->setMessage(trans('core/setting::setting.generate_thumbnails_error', ['count' => count($errors)]));
+                ->setMessage(trans('core/setting::setting.generate_thumbnails_error', ['count' => count($errors)]))
+                ->setData([
+                    'total' => $totalFiles,
+                    'next' => $offset + $limit,
+                ]);
         }
 
         return $this

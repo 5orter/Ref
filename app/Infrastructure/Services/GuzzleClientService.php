@@ -6,9 +6,7 @@ use App\Constants\Logging;
 use App\Contracts\ClientAPI\Client;
 use App\Contracts\ClientAPI\RequestBuilder;
 use App\Infrastructure\Builders\GuzzleRequestBuilder;
-use Prophecy\Exception\Doubler\MethodNotFoundException;
-
-/** @noinspection PhpHierarchyChecksInspection */
+//use Prophecy\Exception\Doubler\MethodNotFoundException;
 
 class GuzzleClientService implements Client
 {
@@ -21,12 +19,12 @@ class GuzzleClientService implements Client
     ];
 
     /**
-     * @param $method
-     * @param $url
+     * @param string $method
+     * @param string $url
      * @param array $options
      * @return GuzzleRequestBuilder
      */
-    public function request($method, $url, array $options = [])
+    public function request(string $method, string $url, array $options = [])
     {
         if (!in_array(strtolower($method), static::SUPPORTED_HTTP_VERBS)) {
             throw new \RuntimeException('Method not found.');
@@ -55,11 +53,11 @@ class GuzzleClientService implements Client
     }
 
     /**
-     * @param $name
-     * @param $arguments
+     * @param string $name
+     * @param array $arguments
      * @return mixed
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, array $arguments)
     {
         if (in_array(strtolower($name), static::SUPPORTED_HTTP_VERBS)) {
             $url = $arguments[0];

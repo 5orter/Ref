@@ -131,7 +131,6 @@ return [
         'username_placeholder' => 'Username to login to mail server',
         'password' => 'Password',
         'password_placeholder' => 'Password to login to mail server',
-        'encryption' => 'Encryption',
         'mail_gun_domain' => 'Domain',
         'mail_gun_domain_placeholder' => 'Domain',
         'mail_gun_secret' => 'Secret',
@@ -140,7 +139,6 @@ return [
         'mail_gun_endpoint_placeholder' => 'Endpoint',
         'log_channel' => 'Log channel',
         'sendmail_path' => 'Sendmail Path',
-        'encryption_placeholder' => 'Encryption: ssl or tls',
         'local_domain' => 'Local domain',
         'local_domain_placeholder' => 'It can be empty. Needs to set to your domain when using SMTP Relay. E.g. your-domain.com',
 
@@ -308,6 +306,8 @@ return [
         'upload_path_placeholder' => 'Example: uploads',
         'upload_path_helper' => 'That folder will be created in /public. The default folder is ":folder". Then it will be uploaded into "/public/:folder".',
         'upload_path_warning' => 'The system won\'t move existing files to the new folder. If you want to move existing files to the new folder, you need to do it manually.',
+        'convert_file_name_to_uuid' => 'Convert file name to UUID',
+        'convert_file_name_to_uuid_helper' => 'When enabled, the system will convert the file name to UUID when uploading. It is useful to prevent duplicate file names and better security.',
     ],
     'license' => [
         'purchase_code' => 'Purchase code',

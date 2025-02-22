@@ -48,6 +48,38 @@
         @include(Theme::getThemeNamespace('views.marketplace.stores.items'), compact('products'))
     </div>
     <div class="col-lg-3 primary-sidebar sticky-sidebar">
-        @include(Theme::getThemeNamespace('views.marketplace.stores.partials.sidebar'), ['isShowSearchForm' => true])
+        @if (MarketplaceHelper::isEnabledMessagingSystem() && (! auth('customer')->check() || $store->id != auth('customer')->user()->store->id))
+            <div class="sidebar-widget mb-30">
+                <p class="section-title style-1 mb-15 font-heading h6" data-title="{{ __('Contact Vendor') }}" style="font-size: 1rem;">{{ __('Contact Vendor') }}</p>
+                <div class="mb-4">
+                    <p class="mb-3">{{ __('All messages are recorded and spam is not tolerated. Your email address will be shown to the recipient.') }}</p>
+                    {!!
+                        $contactForm
+                            ->setFormOption('class', 'contact-form-style bb-contact-store-form')
+                            ->setFormInputClass(' ')
+                            ->setFormLabelClass('d-none sr-only')
+                            ->setFormInputWrapperClass('form-group mb-20')
+                            ->modify(
+                                'submit',
+                                'submit',
+                                Botble\Base\Forms\FieldOptions\ButtonFieldOption::make()
+                                    ->addAttribute('data-bb-loading', 'button-loading')
+                                    ->cssClass('submit submit-auto-width')
+                                    ->label(__('Send message'))
+                                    ->wrapperAttributes(['class' => 'col-12'])
+                                    ->toArray(),
+                                true
+                            )
+                            ->renderForm()
+                    !!}
+                </div>
+
+                @include(MarketplaceHelper::viewPath('includes.contact-form-script'))
+            </div>
+        @endif
+
+        <form action="{{ $store->url }}" method="GET" id="products-filter-ajax" data-scroll-to=".products-listing">
+            @include(Theme::getThemeNamespace('views.marketplace.stores.partials.sidebar'), ['isShowSearchForm' => true])
+        </form>
     </div>
 </div>

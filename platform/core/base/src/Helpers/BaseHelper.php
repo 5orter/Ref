@@ -64,7 +64,7 @@ class BaseHelper
 
     public function humanFilesize(float $bytes, int $precision = 2): string
     {
-        $units = ['B', 'kB', 'MB', 'GB', 'TB'];
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
@@ -564,13 +564,13 @@ class BaseHelper
     public function getFonts(): array
     {
         $customGoogleFonts = config('core.base.general.custom_google_fonts');
-        $customFonts = config('core.base.general.custom_fonts');
+        $customFonts = apply_filters('cms_custom_fonts', config('core.base.general.custom_fonts', []) ?: []);
 
-        if (! empty($customGoogleFonts)) {
+        if (! empty($customGoogleFonts) && ! is_array($customGoogleFonts)) {
             $customGoogleFonts = array_filter(explode(',', $customGoogleFonts));
         }
 
-        if (! empty($customFonts)) {
+        if (! empty($customFonts) && ! is_array($customFonts)) {
             $customFonts = array_filter(explode(',', $customFonts));
         }
 

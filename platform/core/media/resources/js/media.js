@@ -600,12 +600,15 @@ class MediaManagement {
                 {
                     action: $form.data('action'),
                     selected: items,
+                    skip_trash: $form.find('input[name="skip_trash"]').is(':checked'),
                 },
                 (res) => {
                     $form.closest('.modal').modal('hide')
                     if (!res.error) {
                         _self.MediaService.getMedia(true)
                     }
+
+                    $form.find('input[name="skip_trash"]').prop('checked', false)
 
                     Botble.hideButtonLoading($form.find('button[type="submit"]'))
                 }

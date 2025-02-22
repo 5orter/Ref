@@ -145,7 +145,7 @@ class DiscountSupport
                 $customerId = auth('customer')->check() ? auth('customer')->id() : 0;
             }
 
-            if ($discount->target === DiscountTargetEnum::ONCE_PER_CUSTOMER && $customerId) {
+            if ($discount->target == DiscountTargetEnum::ONCE_PER_CUSTOMER && $customerId) {
                 $discount->usedByCustomers()->syncWithoutDetaching([$customerId]);
             }
         }
@@ -169,7 +169,7 @@ class DiscountSupport
                 $customerId = auth('customer')->check() ? auth('customer')->id() : 0;
             }
 
-            if ($discount->target === DiscountTargetEnum::ONCE_PER_CUSTOMER && $customerId) {
+            if ($discount->target == DiscountTargetEnum::ONCE_PER_CUSTOMER && $customerId) {
                 $discount->usedByCustomers()->detach($customerId);
             }
         }

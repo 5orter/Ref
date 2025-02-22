@@ -1,8 +1,4 @@
 @if (! (bool) get_ecommerce_setting('disable_shipping_options', false))
-    @php
-        $shipping = array_filter($shipping ?? []);
-    @endphp
-
     @if (! empty($shipping))
         <div class="payment-checkout-form">
             <input
@@ -33,7 +29,6 @@
             </ul>
         </div>
     @else
-
         @php
             $sessionCheckoutData = $sessionCheckoutData ?? OrderHelper::getOrderSessionData();
         @endphp

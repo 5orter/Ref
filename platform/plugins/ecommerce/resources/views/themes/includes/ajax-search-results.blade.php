@@ -31,7 +31,7 @@
     </div>
 
     <div class="bb-quick-search-view-all">
-        <a href="#" onclick="event.preventDefault(); document.getElementById('bb-form-quick-search').submit();">{{ __('View all results') }}</a>
+        <a href="#" onclick="event.preventDefault(); this.closest('.bb-form-quick-search').submit();">{{ __('View all results') }}</a>
     </div>
 @else
     <div class="bb-quick-search-empty">

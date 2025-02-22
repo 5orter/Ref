@@ -1,6 +1,7 @@
 <?php
 
 use Botble\Base\Facades\AdminHelper;
+use Botble\Base\Http\Middleware\RequiresJsonRequestMiddleware;
 use Botble\Theme\Facades\Theme;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,10 @@ Route::group(['namespace' => 'Botble\Newsletter\Http\Controllers'], function ():
                 'as' => 'public.newsletter.unsubscribe',
                 'uses' => 'PublicController@getUnsubscribe',
             ]);
+
+            Route::get('ajax/newsletter/popup', 'PublicController@ajaxLoadPopup')
+                ->middleware(RequiresJsonRequestMiddleware::class)
+                ->name('public.ajax.newsletter-popup');
         });
     }
 });

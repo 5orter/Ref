@@ -76,6 +76,7 @@ return [
         'refunded' => 'Refunded',
         'fraud' => 'Fraud',
         'failed' => 'Failed',
+        'canceled' => 'Canceled',
     ],
     'payment_methods_instruction' => 'Guide customers to pay directly. You can choose to pay by delivery or bank transfer',
     'payment_method_description' => 'Payment guide - (Displayed on the notice of successful purchase and payment page)',

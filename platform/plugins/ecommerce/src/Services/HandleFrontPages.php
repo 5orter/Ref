@@ -3,6 +3,7 @@
 namespace Botble\Ecommerce\Services;
 
 use Botble\Base\Enums\BaseStatusEnum;
+use Botble\Base\Facades\AdminHelper;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Base\Supports\Helper;
 use Botble\Ecommerce\AdsTracking\FacebookPixel;
@@ -28,7 +29,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 
 class HandleFrontPages
 {
@@ -49,7 +49,7 @@ class HandleFrontPages
 
         $response = BaseHttpResponse::make();
 
-        $isPreview = Auth::guard()->check() && $request->input('preview');
+        $isPreview = AdminHelper::isPreviewing();
 
         switch ($slug->reference_type) {
             case Product::class:
@@ -83,7 +83,7 @@ class HandleFrontPages
                     ]
                 );
 
-                abort_unless($product, 404);
+                abort_if(! $product, 404);
 
                 $this->productCrossSalePriceService->applyProduct($product);
 
@@ -159,11 +159,13 @@ class HandleFrontPages
                 );
 
                 if (! $product->is_variation && $productVariation) {
-                    $product = app(UpdateDefaultProductService::class)->updateColumns($product, $productVariation);
                     $selectedProductVariation = $productVariation->defaultVariation;
                     $selectedProductVariation->product_id = $productVariation->id;
-
                     $product->defaultVariation = $selectedProductVariation;
+
+                    if (! $product->defaultVariation->product->isOutOfStock()) {
+                        $product = app(UpdateDefaultProductService::class)->updateColumns($product, $productVariation);
+                    }
 
                     $product->image = $selectedProductVariation->configurableProduct->image ?: $product->image;
                 }
@@ -178,7 +180,7 @@ class HandleFrontPages
                 ];
 
             case ProductCategory::class:
-                                /**
+                /**
                  * @var ProductCategory $category
                  */
                 $category = ProductCategory::query()
@@ -395,8 +397,6 @@ class HandleFrontPages
             compact('total')
         );
 
-        $data = view(EcommerceHelper::viewPath('includes.product-items'), compact('products'))->render();
-
         $breadcrumbView = Theme::getThemeNamespace('partials.breadcrumbs');
 
         if (view()->exists($breadcrumbView)) {
@@ -410,6 +410,8 @@ class HandleFrontPages
         if (view()->exists($filtersView)) {
             $additional['filters_html'] = view($filtersView, compact('category'))->render();
         }
+
+        $data = view(EcommerceHelper::viewPath('includes.product-items'), compact('products'))->render();
 
         return $response
             ->setData($data)

@@ -103,3 +103,14 @@
         }
     }
 }
+
+body[dir="rtl"] {
+    .auth-card form .auth-input-icon {
+        left: auto;
+        right: 1px;
+    }
+
+    svg.icon.svg-icon-ti-ti-arrow-narrow-right {
+        transform: rotate(180deg);
+    }
+}

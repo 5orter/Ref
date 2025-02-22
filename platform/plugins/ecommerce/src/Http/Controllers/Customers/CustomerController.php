@@ -183,7 +183,7 @@ class CustomerController extends BaseController
 
         return $this
             ->httpResponse()
-            ->setData($customer->orders()->count());
+            ->setData($customer->completedOrders()->count());
     }
 
     public function postCreateCustomerWhenCreatingOrder(AddCustomerWhenCreateOrderRequest $request)

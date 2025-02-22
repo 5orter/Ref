@@ -26,3 +26,21 @@
 <div data-site-cookie-lifetime="{{ $cookieConsentConfig['cookie_lifetime'] ?? 36000 }}"></div>
 <div data-site-cookie-domain="{{ config('session.domain') ?? request()->getHost() }}"></div>
 <div data-site-session-secure="{{ config('session.secure') ? ';secure' : null }}"></div>
+
+<script>
+    window.addEventListener('load', function () {
+        if (typeof gtag !== 'undefined') {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied'
+            });
+
+            document.addEventListener('click', function(event) {
+                if (event.target.classList.contains('js-cookie-consent-agree')) {
+                    gtag('consent', 'update', {
+                        'ad_storage': 'granted'
+                    });
+                }
+            });
+        }
+    });
+</script>

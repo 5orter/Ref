@@ -1,4 +1,4 @@
-<div class="bg-light p-2">
+<div class="bg-light py-2">
     <p class="font-weight-bold mb-0">{{ __('Product(s)') }}:</p>
 </div>
 
@@ -51,7 +51,7 @@
                 @endif
             </div>
 
-            <div class="p-3">
+            <div class="py-3">
                 @foreach ($grouped['products'] as $product)
                     @include('plugins/ecommerce::orders.checkout.product', [
                         'product' => $product,
@@ -62,7 +62,7 @@
             </div>
 
             @if ($isAvailableShipping)
-                <div class="shipping-method-wrapper p-3">
+                <div class="shipping-method-wrapper py-3">
                     @if (!empty($shipping))
                         <div class="payment-checkout-form">
                             <h6>{{ __('Shipping method') }}:</h6>

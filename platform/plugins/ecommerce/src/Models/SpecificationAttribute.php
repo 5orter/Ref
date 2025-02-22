@@ -4,6 +4,7 @@ namespace Botble\Ecommerce\Models;
 
 use Botble\Base\Facades\AdminHelper;
 use Botble\Base\Models\BaseModel;
+use Botble\Ecommerce\Enums\SpecificationAttributeFieldType;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class SpecificationAttribute extends BaseModel
@@ -22,6 +23,7 @@ class SpecificationAttribute extends BaseModel
 
     protected $casts = [
         'options' => 'array',
+        'type' => SpecificationAttributeFieldType::class,
     ];
 
     protected static function booted(): void

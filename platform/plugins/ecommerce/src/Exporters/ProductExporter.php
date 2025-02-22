@@ -22,16 +22,16 @@ class ProductExporter extends Exporter
 
     protected array $supportedLocales = [];
 
-    protected string $defaultLanguage;
+    protected ?string $defaultLanguage = null;
 
     public function __construct()
     {
         $this->isMarketplaceActive = is_plugin_active('marketplace');
         $this->isEnabledDigital = EcommerceHelper::isEnabledSupportDigitalProducts();
 
-        if (defined('LANGUAGE_MODULE_SCREEN_NAME')) {
+        if (defined('LANGUAGE_MODULE_SCREEN_NAME') && defined('LANGUAGE_ADVANCED_MODULE_SCREEN_NAME')) {
             $this->supportedLocales = Language::getSupportedLocales();
-            $this->defaultLanguage = Language::getDefaultLanguage(['lang_code'])->lang_code;
+            $this->defaultLanguage = Language::getDefaultLanguage(['lang_code'])?->lang_code;
         }
     }
 

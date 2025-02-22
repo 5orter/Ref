@@ -38,8 +38,8 @@ class EmailSettingForm extends SettingForm
                             'mailgun' => 'Mailgun',
                             'ses' => 'SES',
                             'postmark' => 'Postmark',
-                            'log' => 'Log',
-                            'array' => 'Array',
+                            'log' => 'Log (for testing only, will not send email)',
+                            'array' => 'Array (for testing only, will not send email)',
                         ] + (function_exists('proc_open') ? ['sendmail' => 'Sendmail'] : [])))
                 ->selected($mailer)
                 ->addAttribute('data-bb-toggle', 'collapse')

@@ -108,7 +108,6 @@ trait HasLocationFields
                 $stateAttributes,
                 $isMultipleCountries
             ): void {
-                $model = $this->getModel();
 
                 $form->add(
                     $stateFieldName,

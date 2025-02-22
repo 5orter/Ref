@@ -547,6 +547,14 @@ Product option
     }
 }
 
+.collapse-product-option {
+    .btn.remove-row {
+        .icon {
+            margin: 0;
+        }
+    }
+}
+
 @media screen and (max-width: 768px) {
     .order-products-table {
         td {

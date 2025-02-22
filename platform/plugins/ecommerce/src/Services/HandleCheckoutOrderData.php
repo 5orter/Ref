@@ -82,19 +82,9 @@ class HandleCheckoutOrderData
 
             $shipping = [];
 
-            $defaultShippingMethod = $request->input(
-                'shipping_method',
-                Arr::get($sessionCheckoutData, 'shipping_method', ShippingMethodEnum::DEFAULT)
-            );
-
-            $defaultShippingOption = $request->input(
-                'shipping_option',
-                Arr::get($sessionCheckoutData, 'shipping_option')
-            );
-
-            $defaultShippingOption = is_string($defaultShippingOption) ? $defaultShippingOption : null;
-
             $shippingAmount = 0;
+            $defaultShippingMethod = $request->input('shipping_method') ?: Arr::get($sessionCheckoutData, 'shipping_method', ShippingMethodEnum::DEFAULT);
+            $defaultShippingOption = null;
 
             if ($isAvailableShipping = EcommerceHelper::isAvailableShipping($products)) {
                 $origin = EcommerceHelper::getOriginAddress();
@@ -117,6 +107,11 @@ class HandleCheckoutOrderData
                 }
 
                 if ($shipping) {
+                    $defaultShippingMethod = $request->input(
+                        'shipping_method',
+                        Arr::get($sessionCheckoutData, 'shipping_method', ShippingMethodEnum::DEFAULT)
+                    );
+
                     if (! $defaultShippingMethod) {
                         $defaultShippingMethod = old(
                             'shipping_method',
@@ -124,14 +119,24 @@ class HandleCheckoutOrderData
                         );
                     }
 
-                    if (! $defaultShippingOption) {
-                        $defaultShippingOption = old(
+                    $defaultShippingOption = Arr::first(array_keys(Arr::first($shipping)));
+
+                    if ($optionRequest = $request->input('shipping_option', old('shipping_option'))) {
+                        if (
+                            (is_string($optionRequest) || is_int($optionRequest))
+                            && array_key_exists($optionRequest, Arr::get($shipping, $defaultShippingMethod))
+                        ) {
+                            $defaultShippingOption = $optionRequest;
+                        }
+                    } else {
+                        $defaultShippingOptionFromSession = Arr::get(
+                            $sessionCheckoutData,
                             'shipping_option',
-                            Arr::get($sessionCheckoutData, 'shipping_option', $defaultShippingOption)
+                            $defaultShippingOption
                         );
 
-                        if (! $defaultShippingOption) {
-                            $defaultShippingOption = Arr::first(array_keys(Arr::first($shipping)));
+                        if (isset($shipping[$defaultShippingMethod][$defaultShippingOptionFromSession])) {
+                            $defaultShippingOption = $defaultShippingOptionFromSession;
                         }
                     }
 

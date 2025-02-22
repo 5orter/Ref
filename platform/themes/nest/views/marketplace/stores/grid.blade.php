@@ -8,18 +8,22 @@
             @endphp
 
             @if ($description || $content)
-                {!! $content ?: $description !!}
+                <div class='ck-content'>
+                    {!! $content ?: $description !!}
+                </div>
             @endif
         </div>
 
-        <div class="col-lg-5 mx-auto">
-            <div class="sidebar-widget-2 widget_search mb-50">
-                <div class="search-form form-group">
-                    <input name="q" value="{{ BaseHelper::stringify(request()->input('q')) }}" type="text" placeholder="{{ __('Search in this store...') }}">
-                    <button type="submit"><i class="fi-rs-search"></i></button>
+        <form action="{{ $store->url }}" method="GET" id="products-filter-ajax" data-scroll-to=".products-listing">
+            <div class="col-lg-5 mx-auto">
+                <div class="sidebar-widget-2 widget_search mb-50">
+                    <div class="search-form form-group">
+                        <input name="q" value="{{ BaseHelper::stringify(request()->input('q')) }}" type="text" placeholder="{{ __('Search in this store...') }}">
+                        <button type="submit"><i class="fi-rs-search"></i></button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 <div class="row flex-row-reverse">
@@ -47,6 +51,35 @@
 
                 <div class="vendor-info">
                     @include(Theme::getThemeNamespace('views.marketplace.stores.partials.info'))
+
+                    @if (MarketplaceHelper::isEnabledMessagingSystem() && (! auth('customer')->check() || $store->id != auth('customer')->user()->store->id))
+                        <div class="mt-3">
+                            <p class="section-title style-1 mb-15 font-heading h6" data-title="{{ __('Contact Vendor') }}" style="font-size: 1rem;">{{ __('Contact Vendor') }}</p>
+                            <div class="mb-4">
+                                <p class="mb-3">{{ __('All messages are recorded and spam is not tolerated. Your email address will be shown to the recipient.') }}</p>
+                                {!!
+                                    $contactForm
+                                        ->setFormOption('class', 'contact-form-style bb-contact-store-form')
+                                        ->setFormInputClass(' ')
+                                        ->setFormLabelClass('d-none sr-only')
+                                        ->setFormInputWrapperClass('form-group mb-20')
+                                        ->modify(
+                                            'submit',
+                                            'submit',
+                                            Botble\Base\Forms\FieldOptions\ButtonFieldOption::make()
+                                                ->addAttribute('data-bb-loading', 'button-loading')
+                                                ->cssClass('submit submit-auto-width')
+                                                ->label(__('Send message'))
+                                                ->wrapperAttributes(['class' => 'col-12']),
+                                            true
+                                        )
+                                        ->renderForm()
+                                !!}
+                            </div>
+
+                            @include(MarketplaceHelper::viewPath('includes.contact-form-script'))
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

@@ -201,8 +201,8 @@
                                     required
                                 >
                                     <option value="">{{ __('Select state...') }}</option>
-                                    @if (old('address.country', Arr::get($sessionCheckoutData, 'country')) || !EcommerceHelper::isUsingInMultipleCountries())
-                                        @foreach (EcommerceHelper::getAvailableStatesByCountry(old('address.country', Arr::get($sessionCheckoutData, 'country'))) as $stateId => $stateName)
+                                    @if (old('address.country', Arr::get($sessionCheckoutData, 'country') ?: EcommerceHelper::getDefaultCountryId()) || !EcommerceHelper::isUsingInMultipleCountries())
+                                        @foreach (EcommerceHelper::getAvailableStatesByCountry(old('address.country', Arr::get($sessionCheckoutData, 'country') ?: EcommerceHelper::getDefaultCountryId())) as $stateId => $stateName)
                                             <option
                                                 value="{{ $stateId }}"
                                                 @if (old('address.state', Arr::get($sessionCheckoutData, 'state')) == $stateId) selected @endif

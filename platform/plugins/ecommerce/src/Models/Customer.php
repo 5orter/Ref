@@ -80,6 +80,11 @@ class Customer extends BaseModel implements
         return $this->hasMany(Order::class, 'user_id', 'id');
     }
 
+    public function completedOrders(): HasMany
+    {
+        return $this->orders()->whereNotNull('completed_at');
+    }
+
     public function addresses(): HasMany
     {
         return $this

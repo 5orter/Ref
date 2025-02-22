@@ -259,16 +259,16 @@
         -ms-user-select: none;
         user-select: none;
         background-image: none;
-        border: 1px solid #2e6da4;
+        border: 1px solid var(--primary-color);
         border-radius: 4px;
         color: #ffffff;
-        background-color: #337ab7;
+        background-color: var(--primary-color);
 
         &:hover,
         &:focus {
             color: #ffffff;
-            background-color: #286090;
-            border-color: #204d74;
+            background-color: var(--primary-color-hover);
+            border-color: var(--primary-color-hover);
         }
     }
 

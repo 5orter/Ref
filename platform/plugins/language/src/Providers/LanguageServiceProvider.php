@@ -127,10 +127,6 @@ class LanguageServiceProvider extends ServiceProvider
 
     public function addLanguageMiddlewareToPublicRoute(array $data): array
     {
-        if ($this->app->runningInConsole()) {
-            return $data;
-        }
-
         $locale = Language::setLocale();
 
         if (

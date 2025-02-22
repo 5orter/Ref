@@ -11,6 +11,20 @@ config([
             'headers' => [
                 'Content-Type' => 'application/json',
             ]
-        ]
+        ],
+        'getGoods' => [
+            'method' => 'post',
+            'url' => 'https://dbservices.armsoft.am/mobiletrade/api/Data/Goods/',
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ]
+        ],
+        'getGoodsRemsDetailedByStorage' => [
+            'method' => 'post',
+            'url' => 'https://dbservices.armsoft.am/mobiletrade/api/Data/GoodsRemsDetailedByStorage',
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ]
+        ],
     ]
 ]);

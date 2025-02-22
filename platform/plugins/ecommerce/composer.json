@@ -4,6 +4,6 @@
     "type": "package",
     "require": {
         "khaled.alshamaa/ar-php": "^6.3",
-        "bacon/bacon-qr-code": "^v3.0"
+        "bacon/bacon-qr-code": "^2.0|^3.0"
     }
 }

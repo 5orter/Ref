@@ -41,8 +41,6 @@ class Theme implements ThemeContract
 
     protected string $layout;
 
-    protected string $pageData;
-
     protected string $content;
 
     protected array $regions = [];
@@ -608,18 +606,6 @@ class Theme implements ThemeContract
     }
 
     /**
-     * @return array|mixed
-     */
-    public function pageData()
-    {
-        if (!empty($this->regions['page'])) {
-            return $this->regions['page'];
-        }
-
-        return [];
-    }
-
-    /**
      * Return asset instance.
      */
     public function asset(): Asset|AssetContainer
@@ -1068,8 +1054,12 @@ class Theme implements ThemeContract
         return apply_filters('theme_site_title', theme_option('site_title'));
     }
 
-    public function getLogoImage(array $attributes = [], string $logoKey = 'logo', int $maxHeight = 0, ?string $logoUrl = null): ?HtmlString
-    {
+    public function getLogoImage(
+        array $attributes = [],
+        string $logoKey = 'logo',
+        int $maxHeight = 0,
+        ?string $logoUrl = null
+    ): ?HtmlString {
         if ($logoUrl) {
             $logo = $logoUrl;
         } else {
@@ -1080,18 +1070,13 @@ class Theme implements ThemeContract
             return null;
         }
 
-        $attributes = [
-            'loading' => false,
-            ...$attributes,
-        ];
-
         $height = theme_option('logo_height') ?: $maxHeight;
 
         if ($height) {
             $attributes['style'] = sprintf('max-height: %s', is_numeric($height) ? "{$height}px" : $height);
         }
 
-        return apply_filters('theme_logo_image', RvMedia::image($logo, $this->getSiteTitle(), attributes: $attributes));
+        return apply_filters('theme_logo_image', RvMedia::image($logo, $this->getSiteTitle(), attributes: $attributes, lazy: false));
     }
 
     public function formatDate(CarbonInterface|string|int|null $date, ?string $format = null): ?string
@@ -1109,5 +1094,10 @@ class Theme implements ThemeContract
     public function renderSocialSharing(?string $url = null, ?string $title = null, ?string $thumbnail = null): string
     {
         return ThemeSupport::renderSocialSharingButtons($url, $title, $thumbnail);
+    }
+
+    public function termAndPrivacyPolicyUrl(): ?string
+    {
+        return theme_option('term_and_privacy_policy_url');
     }
 }

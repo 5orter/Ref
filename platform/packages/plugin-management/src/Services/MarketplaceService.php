@@ -36,7 +36,7 @@ class MarketplaceService
 
         $this->token = $token ?? $core['marketplaceToken'];
 
-        $this->publishedPath = storage_path('app/marketplace/');
+        $this->publishedPath = storage_path('app/marketplace');
 
         $this->productId = $core['productId'];
 
@@ -109,24 +109,25 @@ class MarketplaceService
             throw new Exception(Arr::get($content, 'message') ?: $data);
         }
 
-        File::ensureDirectoryExists($this->publishedPath . $id);
+        $storageTempPath = $this->publishedPath . '/' . $id;
 
-        $destination = $this->publishedPath . $id . '/' . $name . '.zip';
+        File::ensureDirectoryExists($storageTempPath, 0775);
 
-        File::cleanDirectory($this->publishedPath . $id);
+        $destination = $storageTempPath . '/' . $name . '.zip';
+
+        File::cleanDirectory($storageTempPath);
 
         File::put($destination, $data);
 
-        $this->extractFile($id, $name);
-        $this->copyToPath($id, plugin_path($name));
+        $this->extractFile($storageTempPath, $name);
+        $this->copyToPath($storageTempPath, plugin_path($name));
 
         return true;
     }
 
-    protected function extractFile(string $id, string $name): string
+    protected function extractFile(string $pathTo, string $name): string
     {
-        $destination = $this->publishedPath . $id . '/' . $name . '.zip';
-        $pathTo = $this->publishedPath . $id;
+        $destination = $pathTo . '/' . $name . '.zip';
 
         $zipper = new Zipper();
 
@@ -139,15 +140,15 @@ class MarketplaceService
         return $pathTo;
     }
 
-    protected function copyToPath(string $id, string $path): string
+    protected function copyToPath(string $fromPath, string $destinationPath): string
     {
-        $pathTemp = $this->publishedPath . $id;
+        File::ensureDirectoryExists($destinationPath, 0775);
 
-        if (File::isDirectory($pathTemp)) {
-            File::copyDirectory($pathTemp, $path);
-            File::deleteDirectory($pathTemp);
+        if (File::isDirectory($fromPath)) {
+            File::copyDirectory($fromPath, $destinationPath);
+            File::deleteDirectory($fromPath);
         }
 
-        return $path;
+        return $destinationPath;
     }
 }

@@ -373,16 +373,16 @@ class Manager
 
     public function updateThemeTranslations(): int
     {
-        $theme = Theme::hasInheritTheme() ? Theme::getInheritTheme() : Theme::getThemeName();
         $keys = $this->findJsonTranslations(core_path());
         $keys += $this->findJsonTranslations(package_path());
         $keys += $this->findJsonTranslations(plugin_path());
-        $keys += $this->findJsonTranslations(theme_path($theme));
+        $keys += $this->findJsonTranslations(theme_path());
+
         ksort($keys);
 
         $data = json_encode($keys, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-        BaseHelper::saveFileData(theme_path(sprintf('%s/lang/en.json', $theme)), $data, false);
+        BaseHelper::saveFileData(theme_path(sprintf('%s/lang/en.json', Theme::getThemeName())), $data, false);
 
         return count($keys);
     }

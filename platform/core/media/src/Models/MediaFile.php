@@ -256,6 +256,10 @@ class MediaFile extends BaseModel
 
     public static function createSlug(string $name, string $extension, ?string $folderPath): string
     {
+        if (setting('media_convert_file_name_to_uuid')) {
+            return Str::uuid() . '.' . $extension;
+        }
+
         if (setting('media_use_original_name_for_file_path')) {
             $slug = $name;
         } else {

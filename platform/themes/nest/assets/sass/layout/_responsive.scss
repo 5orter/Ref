@@ -379,9 +379,6 @@
             margin-left: 15px;
         }
     }
-    .product-cart-wrap .product-img-action-wrap .product-action-1 {
-        min-width: 70px;
-    }
     .custom-modal .modal-dialog {
         max-width: 720px !important;
     }
@@ -797,11 +794,17 @@
     .header-style-1 .main-categories-wrap {
         margin-right: 20px;
     }
-    .product-cart-wrap .product-action-1 a.action-btn {
-        width: 34px;
-        height: 34px;
-        line-height: 40px;
-        font-size: 13px;
+    .product-cart-wrap .product-action-1 {
+        .product-action-wrap {
+            max-width: 111px;
+
+            a.action-btn {
+                width: 34px;
+                height: 34px;
+                line-height: 40px;
+                font-size: 13px;
+            }
+        }
     }
     .banner-big {
         h1 {

@@ -9,7 +9,6 @@ use Botble\Media\Facades\RvMedia;
 use Botble\Page\Models\Page;
 use Botble\SeoHelper\Facades\SeoHelper;
 use Botble\Slug\Models\Slug;
-use Botble\Theme\Events\RenderingSingleEvent;
 use Botble\Theme\Facades\Theme;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -87,8 +86,6 @@ class PageService
         }
 
         do_action(BASE_ACTION_PUBLIC_RENDER_SINGLE, PAGE_MODULE_SCREEN_NAME, $page);
-
-        event(new RenderingSingleEvent($slug ?: new Slug()));
 
         return [
             'view' => 'page',

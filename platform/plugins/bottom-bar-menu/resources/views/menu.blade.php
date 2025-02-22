@@ -1,5 +1,8 @@
 <div class="footer-mobile">
-    <ul class="menu--footer">
+    <ul
+        @class(['menu--footer', 'menu--footer__hide_text' => theme_option('bottom_bar_menu_show_text', 'yes') != 'yes'])
+        style="--bottom-bar-menu-text-font-size: {{ theme_option('bottom_bar_menu_text_font_size', 12) }}px;"
+    >
         <li>
             <a href="{{ route('public.index') }}">
                 <i class="fi-rs-home"></i>

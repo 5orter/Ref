@@ -953,9 +953,7 @@ class HookServiceProvider extends ServiceProvider
             }
 
             if ($product->maximum_order_quantity > 0 && $quantityOfProduct > $product->maximum_order_quantity) {
-                $message = __('You cannot buy more than :quantity.', [
-                    'quantity' => $product->maximum_order_quantity,
-                ]);
+                $message = __('Sorry, you can only order a maximum of :quantity units of :product at a time. Please adjust the quantity and try again.', ['quantity' => $product->maximum_order_quantity, 'product' => $product->name]);
             }
 
             if (! $message) {
@@ -1021,6 +1019,57 @@ class HookServiceProvider extends ServiceProvider
                         'default' => "<code>$value</code>",
                     ]
                 ),
+            ];
+        }
+
+        $seoFields = [];
+        $seoPages = [
+            'products' => __('Products'),
+        ];
+
+        if (EcommerceHelper::isOrderTrackingEnabled()) {
+            $seoPages['order_tracking'] = __('Order Tracking');
+        }
+
+        if (EcommerceHelper::isCartEnabled()) {
+            $seoPages['cart'] = __('Cart');
+        }
+
+        if (EcommerceHelper::isWishlistEnabled()) {
+            $seoPages['wishlist'] = __('Wishlist');
+        }
+
+        if (EcommerceHelper::isCompareEnabled()) {
+            $seoPages['compare'] = __('Compare');
+        }
+
+        foreach ($seoPages as $pageId => $pageName) {
+            $seoFields[] = [
+                'id' => sprintf('ecommerce_%s_seo_title', $pageId),
+                'type' => 'text',
+                'label' => trans('plugins/ecommerce::ecommerce.theme_options.page_seo_title', ['page' => $pageName]),
+                'attributes' => [
+                    'name' => sprintf('ecommerce_%s_seo_title', $pageId),
+                    'value' => __($pageName),
+                    'options' => [
+                        'class' => 'form-control',
+                    ],
+                ],
+            ];
+
+            $seoFields[] = [
+                'id' => sprintf('ecommerce_%s_seo_description', $pageId),
+                'type' => 'textarea',
+                'label' => trans('plugins/ecommerce::ecommerce.theme_options.page_seo_description', ['page' => $pageName]),
+                'attributes' => [
+                    'name' => sprintf('ecommerce_%s_seo_description', $pageId),
+                    'value' => null,
+                    'options' => [
+                        'class' => 'form-control',
+                        'rows' => 3,
+                    ],
+                ],
+                'helper' => __('Leave it empty to use the default description from Theme options -> General.'),
             ];
         }
 
@@ -1123,6 +1172,7 @@ class HookServiceProvider extends ServiceProvider
                         'priority' => 1001,
                     ],
                 ],
+                'priority' => 600,
             ])
             ->setSection([
                 'title' => trans('plugins/ecommerce::ecommerce.theme_options.slug_name'),
@@ -1131,6 +1181,16 @@ class HookServiceProvider extends ServiceProvider
                 'subsection' => true,
                 'icon' => 'ti ti-link',
                 'fields' => $fields,
+                'priority' => 650,
+            ])
+            ->setSection([
+                'title' => trans('plugins/ecommerce::ecommerce.theme_options.seo_name'),
+                'description' => trans('plugins/ecommerce::ecommerce.theme_options.seo_description'),
+                'id' => 'opt-text-subsection-ecommerce-seo',
+                'subsection' => true,
+                'icon' => 'ti ti-timeline',
+                'priority' => 700,
+                'fields' => $seoFields,
             ]);
     }
 

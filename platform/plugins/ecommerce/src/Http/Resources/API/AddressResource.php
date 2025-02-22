@@ -2,6 +2,7 @@
 
 namespace Botble\Ecommerce\Http\Resources\API;
 
+use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Models\Address;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,7 +19,7 @@ class AddressResource extends JsonResource
             'is_default' => $this->is_default,
             'phone' => $this->phone,
             'email' => $this->email,
-            'country' => $this->country,
+            'country' => EcommerceHelper::getCountryNameById($this->country),
             'state' => $this->state,
             'city' => $this->city,
             'address' => $this->address,

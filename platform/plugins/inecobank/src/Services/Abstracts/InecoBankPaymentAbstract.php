@@ -316,31 +316,9 @@ abstract class InecoBankPaymentAbstract
     public function supportedCurrencyCodes(): array
     {
         return [
-            'AUD',
-            'BRL',
-            'CAD',
-            'CNY',
-            'CZK',
-            'DKK',
+            'AMD',
             'EUR',
-            'HKD',
-            'HUF',
-            'ILS',
-            'JPY',
-            'MYR',
-            'MXN',
-            'TWD',
-            'NZD',
-            'NOK',
-            'PHP',
-            'PLN',
-            'GBP',
-            'RUB',
-            'SGD',
-            'SEK',
-            'CHF',
-            'THB',
-            'USD',
+            'USD'
         ];
     }
 }

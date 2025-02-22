@@ -642,11 +642,7 @@ class OrderSupportServiceProvider extends ServiceProvider
             if ($mailer->templateEnabled('customer_new_order')) {
                 $this->setEmailVariables($orders);
 
-                EmailHandler::send(
-                    $mailer->getTemplateContent('customer_new_order'),
-                    $mailer->getTemplateSubject('customer_new_order'),
-                    $theFirst->user->email ?: $theFirst->address->email
-                );
+                $mailer->sendUsingTemplate('customer_new_order', $theFirst->user->email ?: $theFirst->address->email);
 
                 if ($saveHistory) {
                     foreach ($orders as $order) {
@@ -786,7 +782,7 @@ class OrderSupportServiceProvider extends ServiceProvider
                             $defaultShippingOption
                         );
 
-                        if (Arr::has($shipping, "$defaultShippingMethod.$defaultShippingOptionFromSession")) {
+                        if (isset($shipping[$defaultShippingMethod][$defaultShippingOptionFromSession])) {
                             $defaultShippingOption = $defaultShippingOptionFromSession;
                         }
                     }

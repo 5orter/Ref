@@ -3,6 +3,7 @@
 namespace Botble\Theme\Supports;
 
 use Botble\Base\Facades\AdminHelper;
+use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\Html;
 use Botble\Base\Forms\Fields\NumberField;
@@ -285,6 +286,24 @@ class ThemeSupport
             add_filter('theme_icon_list_icons', function (array $defaultIcons) use ($icons) {
                 return array_merge($defaultIcons, $icons);
             });
+
+            if ($css) {
+                Assets::addStylesDirectly($css);
+            }
+
+            add_filter('core_icons', function (array $coreIcons) use ($icons) {
+                $themeIcons = [];
+
+                foreach ($icons as $icon) {
+                    $themeIcons[$icon] = [
+                        'name' => $icon,
+                        'basename' => $icon,
+                        'path' => null,
+                    ];
+                }
+
+                return array_merge($coreIcons, $themeIcons);
+            }, 120);
         }
     }
 
@@ -682,12 +701,12 @@ class ThemeSupport
                 'id' => 'lazy_load_placeholder_image',
                 'section_id' => 'opt-text-subsection-general',
                 'type' => 'mediaImage',
-                'label' => __('Lazy load placeholder image'),
+                'label' => __('Lazy load placeholder image (250x250px)'),
                 'attributes' => [
                     'name' => 'lazy_load_placeholder_image',
                     'value' => null,
                 ],
-                'helper' => __('This image will be used as placeholder for lazy load images.'),
+                'helper' => __('This image will be used as placeholder for lazy load images. The best size for this image is 250x250px.'),
             ]);
         });
 
@@ -722,7 +741,7 @@ class ThemeSupport
 
         Theme::asset()
             ->container('footer')
-            ->add('lazyload', asset('vendor/core/packages/theme/plugins/lazyload.min.js'));
+            ->add('lazyload', asset('vendor/core/packages/theme/plugins/lazyload.min.js'), ['jquery'], ['defer'], version: get_cms_version());
 
         add_filter(THEME_FRONT_FOOTER, function (?string $html) {
             if (AdminHelper::isInAdmin()) {
@@ -735,7 +754,7 @@ class ThemeSupport
                         window.Theme = window.Theme || {};
 
                         Theme.lazyLoadInstance = new LazyLoad({
-                            elements_selector: '[data-bb-lazy="true"]',
+                            elements_selector: '[data-bb-lazy="true"]:not(.loaded)',
                         });
                     });
 
@@ -927,9 +946,10 @@ class ThemeSupport
             'M/d/Y',
             'd/m/Y',
             'd/M/Y',
+            'd.m.Y',
         ];
 
-        if ($extraDateFormat = config('packages.theme.extra_date_format')) {
+        if ($extraDateFormat = config('packages.theme.general.extra_date_format')) {
             $formats[] = $extraDateFormat;
         }
 

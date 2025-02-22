@@ -2,6 +2,7 @@
 
 namespace Botble\Base\Http\Middleware;
 
+use Botble\Base\Exceptions\CouldNotConnectToLicenseServerException;
 use Botble\Base\Supports\Core;
 use Closure;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ class EnsureLicenseHasBeenActivated
             ! is_in_admin(true)
             || Auth::guest()
             || $this->core->isSkippedLicenseReminder()
-            || $this->core->verifyLicense(true)
+            || $this->core->verifyLicense(true, 15)
         ) {
             return $next($request);
         }
@@ -36,4 +37,5 @@ class EnsureLicenseHasBeenActivated
 
         return $next($request);
     }
+
 }

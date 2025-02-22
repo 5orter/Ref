@@ -299,7 +299,7 @@ class MediaSettingForm extends SettingForm
             ->addCloseCollapsible('media_driver', 'wasabi')
             ->addOpenCollapsible('media_driver', 'bunnycdn', $mediaDriver === 'bunnycdn')
             ->add(
-                'media_bunnycdn_hostname',
+                'media_bunnycdn_zone',
                 TextField::class,
                 TextFieldOption::make()
                     ->label(trans('core/setting::setting.media.bunnycdn_zone'))
@@ -307,7 +307,7 @@ class MediaSettingForm extends SettingForm
                     ->placeholder('Ex: botble')
             )
             ->add(
-                'media_bunnycdn_zone',
+                'media_bunnycdn_hostname',
                 TextField::class,
                 TextFieldOption::make()
                     ->label(trans('core/setting::setting.media.bunnycdn_hostname'))
@@ -403,6 +403,15 @@ class MediaSettingForm extends SettingForm
                 OnOffFieldOption::make()
                     ->label(trans('core/setting::setting.media.use_original_name_for_file_path'))
                     ->value(setting('media_use_original_name_for_file_path'))
+                    ->colspan(6)
+            )
+            ->add(
+                'media_convert_file_name_to_uuid',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('core/setting::setting.media.convert_file_name_to_uuid'))
+                    ->helperText(trans('core/setting::setting.media.convert_file_name_to_uuid_helper'))
+                    ->value(setting('media_convert_file_name_to_uuid'))
                     ->colspan(6)
             )
             ->add(

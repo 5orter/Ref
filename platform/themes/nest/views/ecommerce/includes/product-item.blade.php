@@ -8,19 +8,32 @@
                 </a>
             </div>
             <div class="product-action-1">
-                <a aria-label="{{ __('Quick View') }}" href="#" class="action-btn hover-up js-quick-view-button" data-url="{{ route('public.ajax.quick-view', $product->id) }}">
-                    <i class="fi-rs-eye"></i>
-                </a>
-                @if (EcommerceHelper::isWishlistEnabled())
-                    <a aria-label="{{ __('Add To Wishlist') }}" href="#" class="action-btn hover-up js-add-to-wishlist-button" data-url="{{ route('public.wishlist.add', $product->id) }}">
-                        <i class="fi-rs-heart"></i>
+                @php
+                    $actionMaxWidth = 40;
+
+                    if (EcommerceHelper::isWishlistEnabled()) {
+                        $actionMaxWidth += 36;
+                    }
+
+                    if (EcommerceHelper::isCompareEnabled()) {
+                        $actionMaxWidth += 40;
+                    }
+                @endphp
+                <div class="product-action-wrap" style="max-width: {{ $actionMaxWidth }}px !important;">
+                    <a aria-label="{{ __('Quick View') }}" href="#" class="action-btn hover-up js-quick-view-button" data-url="{{ route('public.ajax.quick-view', $product->id) }}">
+                        <i class="fi-rs-eye"></i>
                     </a>
-                @endif
-                @if (EcommerceHelper::isCompareEnabled())
-                    <a aria-label="{{ __('Add To Compare') }}" href="#" class="action-btn hover-up js-add-to-compare-button" data-url="{{ route('public.compare.add', $product->id) }}">
-                        <i class="fi-rs-shuffle"></i>
-                    </a>
-                @endif
+                    @if (EcommerceHelper::isWishlistEnabled())
+                        <a aria-label="{{ __('Add To Wishlist') }}" href="#" class="action-btn hover-up js-add-to-wishlist-button" data-url="{{ route('public.wishlist.add', $product->id) }}">
+                            <i class="fi-rs-heart"></i>
+                        </a>
+                    @endif
+                    @if (EcommerceHelper::isCompareEnabled())
+                        <a aria-label="{{ __('Add To Compare') }}" href="#" class="action-btn hover-up js-add-to-compare-button" data-url="{{ route('public.compare.add', $product->id) }}">
+                            <i class="fi-rs-shuffle"></i>
+                        </a>
+                    @endif
+                </div>
             </div>
             <div class="product-badges product-badges-position product-badges-mrg">
                 @if ($product->isOutOfStock())

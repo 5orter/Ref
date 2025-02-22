@@ -19,6 +19,7 @@ class City extends BaseModel
         'state_id',
         'country_id',
         'record_id',
+        'zip_code',
         'slug',
         'image',
         'order',

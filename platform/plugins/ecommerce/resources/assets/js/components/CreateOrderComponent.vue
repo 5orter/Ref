@@ -709,7 +709,7 @@
 
         <ec-modal
             id="add-discounts"
-            title="__('order.add_discount')"
+            :title="__('order.add_discount')"
             :ok-title="__('order.add_discount')"
             :cancel-title="__('order.close')"
             @ok="handleAddDiscount($event)"
@@ -1578,7 +1578,8 @@ export default {
         selectShippingMethod: function (event) {
             event.preventDefault()
             let context = this
-            let $button = $(event.target).find('.btn-primary')
+            let $button = $(event.target)
+            let $modal = $button.closest('.modal')
             $button.addClass('btn-loading')
 
             context.child_is_selected_shipping = true
@@ -1587,9 +1588,10 @@ export default {
                 context.child_shipping_method_name = context.__('order.free_shipping')
                 context.child_shipping_amount = 0
             } else {
-                let selected_shipping = $(event.target).find('.ui-select').val()
+                let selected_shipping = $modal.find('.form-select').val()
+
                 if (!_.isEmpty(selected_shipping)) {
-                    let option = $(event.target).find('.ui-select option:selected')
+                    let option = $modal.find('.form-select option:selected')
                     context.child_shipping_method = option.data('shipping-method')
                     context.child_shipping_option = option.data('shipping-option')
                 }

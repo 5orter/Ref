@@ -145,7 +145,7 @@ trait ProductActionsTrait
                     }
                 }
 
-                event(new ProductQuantityUpdatedEvent($variation->product));
+                ProductQuantityUpdatedEvent::dispatch($variation->product);
 
                 ProductVariationCreated::dispatch($productRelatedToVariation);
 
@@ -693,7 +693,10 @@ trait ProductActionsTrait
         CreateProductWhenCreatingOrderRequest $request,
         BaseHttpResponse $response
     ): BaseHttpResponse {
-        $product = Product::query()->create($request->input());
+        $product = new Product();
+        $product->fill($request->input());
+        $product->status = $request->input('status');
+        $product->save();
 
         event(new CreatedContentEvent(PRODUCT_MODULE_SCREEN_NAME, $request, $product));
 

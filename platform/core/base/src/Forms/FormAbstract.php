@@ -79,6 +79,8 @@ abstract class FormAbstract extends Form implements ExtensibleContract
 
     protected bool $withoutActionButtons = false;
 
+    protected bool $disabledPermalinkField = false;
+
     public function __construct()
     {
         $this->setMethod('POST');
@@ -302,7 +304,7 @@ abstract class FormAbstract extends Form implements ExtensibleContract
             apply_filters(BASE_FILTER_BEFORE_RENDER_FORM, $this, $this->getModel());
         }
 
-         $this->setupMetadataFields();
+        $this->setupMetadataFields();
 
         if ($model instanceof BaseModel) {
             if ($model->getKey()) {
@@ -312,14 +314,12 @@ abstract class FormAbstract extends Form implements ExtensibleContract
             }
         }
 
-        $form = tap(
+        apply_filters(BASE_FILTER_AFTER_RENDER_FORM, $this, $this->getModel());
+
+        return tap(
             parent::renderForm($options, $showStart, $showFields, $showEnd),
             fn ($rendered) => $this->dispatchAfterRendering($rendered)
         );
-
-        apply_filters(BASE_FILTER_AFTER_RENDER_FORM, $this, $this->getModel());
-
-        return $form;
     }
 
     public function renderValidatorJs(): string|JavascriptValidator
@@ -478,7 +478,7 @@ abstract class FormAbstract extends Form implements ExtensibleContract
         $this->onlyValidatedData()->save();
     }
 
-    public function saving(callable|Closure $callback): void
+    public function saving(callable|Closure $callback, bool $withoutEvents = false): void
     {
         $model = $this->getModel();
         $request = $this->request;
@@ -491,17 +491,23 @@ abstract class FormAbstract extends Form implements ExtensibleContract
             }
         }
 
-        $this->dispatchBeforeSaving();
+        if (! $withoutEvents) {
+            $this->dispatchBeforeSaving();
+        }
 
         call_user_func($callback, $this);
 
         $this->saveMetadataFields();
 
+        if (! $withoutEvents) {
+            $this->dispatchAfterSaving();
+        }
+
         $this->dispatchAfterSaving();
 
         $model = $this->getModel();
 
-        if ($model instanceof Model && $model->exists) {
+        if ($model instanceof Model && $model->exists && ! $withoutEvents) {
             $this->fireModelEvents($model);
         }
     }
@@ -598,5 +604,17 @@ abstract class FormAbstract extends Form implements ExtensibleContract
         $this->setFormOption('class', $this->getFormOption('class') . ' ' . $class);
 
         return $this;
+    }
+
+    public function disablePermalinkField(bool $disabled = true): static
+    {
+        $this->disabledPermalinkField = $disabled;
+
+        return $this;
+    }
+
+    public function isDisabledPermalinkField(): bool
+    {
+        return $this->disabledPermalinkField;
     }
 }

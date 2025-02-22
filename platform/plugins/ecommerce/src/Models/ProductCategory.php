@@ -27,10 +27,6 @@ class ProductCategory extends BaseModel implements HasTreeCategoryContract
     use HasTreeCategory;
 
     protected $table = 'ec_product_categories';
-    public const SHOW_STATUSES = [
-        'hide' => 0,
-        'show' => 1
-    ];
 
     protected $fillable = [
         'name',
@@ -49,12 +45,17 @@ class ProductCategory extends BaseModel implements HasTreeCategoryContract
         'status' => BaseStatusEnum::class,
     ];
 
+    public const SHOW_STATUSES = [
+        'hide' => 0,
+        'show' => 1
+    ];
+
     protected static function booted(): void
     {
         static::deleted(function (ProductCategory $category): void {
             $category->products()->detach();
 
-            $category->children()->each(fn (ProductCategory $child) => $child->delete());
+            $category->children()->each(fn(ProductCategory $child) => $child->delete());
 
             $category->brands()->detach();
             $category->productAttributeSets()->detach();
@@ -134,16 +135,7 @@ class ProductCategory extends BaseModel implements HasTreeCategoryContract
     protected function badgeWithCount(): Attribute
     {
         return Attribute::get(function (): HtmlString {
-            $categoryIds = static::getChildrenIds($this->activeChildren);
-
-            if (empty($categoryIds)) {
-                $categoryIds = [$this->getKey()];
-            }
-
-            $productsCount = DB::table('ec_product_category_product')
-                ->whereIn('category_id', $categoryIds)
-                ->distinct('product_id')
-                ->count();
+            $productsCount = $this->count_all_products;
 
             $link = route('products.index', [
                 'filter_table_id' => strtolower(Str::slug(Str::snake(ProductTable::class))),
@@ -153,11 +145,27 @@ class ProductCategory extends BaseModel implements HasTreeCategoryContract
                 'filter_values' => [$this->getKey()],
             ]);
 
-            return Html::link($link, sprintf('(%s)', $productsCount), [
+            return Html::link($link, sprintf('(%d)', $productsCount), [
                 'data-bs-toggle' => 'tooltip',
                 'data-bs-original-title' => trans('plugins/ecommerce::product-categories.total_products', ['total' => $productsCount]),
                 'target' => '_blank',
             ]);
+        })->shouldCache();
+    }
+
+    protected function countAllProducts(): Attribute
+    {
+        return Attribute::get(function (): int {
+            $categoryIds = static::getChildrenIds($this->activeChildren);
+
+            if (empty($categoryIds)) {
+                $categoryIds = [$this->getKey()];
+            }
+
+            return DB::table('ec_product_category_product')
+                ->whereIn('category_id', $categoryIds)
+                ->distinct('product_id')
+                ->count();
         })->shouldCache();
     }
 

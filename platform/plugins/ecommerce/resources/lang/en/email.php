@@ -13,6 +13,9 @@ return [
     'customer_order_cancellation_description' => 'Send to customer when they cancels an order',
     'admin_order_cancellation_title' => 'Order cancellation (by Admin)',
     'admin_order_cancellation_description' => 'Send to customer when admin cancels an order',
+    'order_cancellation_to_admin_title' => 'Order cancellation (will be sent to admins)',
+    'order_cancellation_to_admin_description' => 'Send to admin when customer cancels an order',
+    'order_cancellation_to_admin_subject' => 'Order :order_id has been cancelled by customer',
 
     'delivery_confirmation_title' => 'Delivering confirmation',
     'delivery_confirmation_description' => 'Send to customer when order is delivering',

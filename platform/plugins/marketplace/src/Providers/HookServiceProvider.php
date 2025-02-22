@@ -64,8 +64,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\File as ValidationFile;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Throwable;
 
 class HookServiceProvider extends ServiceProvider
@@ -301,7 +304,6 @@ class HookServiceProvider extends ServiceProvider
                             ->label(__('Register as'))
                             ->choices([0 => __('I am a customer'), 1 => __('I am a vendor')])
                             ->defaultValue(0)
-                            ->toArray()
                     )
                     ->addAfter(
                         'is_vendor',
@@ -316,7 +318,6 @@ class HookServiceProvider extends ServiceProvider
                         TextFieldOption::make()
                             ->label(__('Shop Name'))
                             ->placeholder(__('Ex: My Shop'))
-                            ->toArray()
                     )
                     ->addAfter(
                         'shop_name',
@@ -347,7 +348,6 @@ class HookServiceProvider extends ServiceProvider
                         TextFieldOption::make()
                             ->label(__('Phone Number'))
                             ->placeholder(__('Ex: 0943243332'))
-                            ->toArray()
                     )
                     ->addAfter('shop_phone', 'closeVendorWrapper', HtmlField::class, ['html' => '</div>']);
             });
@@ -408,6 +408,30 @@ class HookServiceProvider extends ServiceProvider
                 errorMessage: __('Checkout is only available for products from one store at a time. Please remove items from other stores before proceeding.')
             );
         }, 999);
+
+        add_filter('core_media_extra_validation', function (array $validation, UploadedFile $fileUpload) {
+            if (AdminHelper::isInAdmin(true)) {
+                return $validation;
+            }
+
+            if (! AdminHelper::isInAdmin() || ! auth('customer')->check() || ! auth('customer')->user()->is_vendor) {
+                return $validation;
+            }
+
+            if ($allowedFileTypes = MarketplaceHelper::mediaMimeTypesAllowed()) {
+                $validator = Validator::make(['uploaded_file' => $fileUpload], [
+                    'uploaded_file' => ['required', ValidationFile::types($allowedFileTypes)],
+                ]);
+
+                if ($validator->fails()) {
+                    throw ValidationException::withMessages([
+                        'uploaded_file' => $validator->getMessageBag()->first(),
+                    ]);
+                }
+            }
+
+            return $validation;
+        }, 999, 2);
     }
 
     public function beforeOrderRefund(BaseHttpResponse $response, Order $order, Request $request): BaseHttpResponse
@@ -556,7 +580,6 @@ class HookServiceProvider extends ServiceProvider
                                 ->searchable()
                                 ->emptyValue(trans('plugins/marketplace::store.forms.select_store'))
                                 ->allowClear()
-                                ->toArray()
                         );
                 });
         } elseif ($form instanceof CustomerForm) {
@@ -711,7 +734,7 @@ class HookServiceProvider extends ServiceProvider
 
                         if ($model instanceof Order) {
                             $query = $query
-                                ->whereHas('address', function ($subQuery) use ($keyword) {
+                                ->orWhereHas('address', function ($subQuery) use ($keyword) {
                                     return $subQuery
                                         ->where('name', 'LIKE', $keyword)
                                         ->orWhere('email', 'LIKE', $keyword)

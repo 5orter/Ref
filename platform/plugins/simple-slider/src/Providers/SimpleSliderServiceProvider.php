@@ -68,7 +68,7 @@ class SimpleSliderServiceProvider extends ServiceProvider
             );
         });
 
-        if (defined('LANGUAGE_MODULE_SCREEN_NAME')) {
+        if (defined('LANGUAGE_MODULE_SCREEN_NAME') && defined('LANGUAGE_ADVANCED_MODULE_SCREEN_NAME')) {
             Language::registerModule(SimpleSlider::class);
         }
 

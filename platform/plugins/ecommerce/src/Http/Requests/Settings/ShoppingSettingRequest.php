@@ -21,6 +21,7 @@ class ShoppingSettingRequest extends Request
             'enable_quick_buy_button' => $onOffRule,
             'order_auto_confirmed' => $onOffRule,
             'quick_buy_target_page' => ['nullable', 'required_if:enable_quick_buy_button,1', 'in:checkout,cart'],
+            'hide_product_price' => $onOffRule,
         ];
     }
 }

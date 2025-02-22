@@ -68,9 +68,14 @@ return [
         'form' => [
             'search_for_an_exact_phrase' => 'Search for an exact phrase',
             'search_products_by' => 'Search products by:',
+            'enable_filter_products_by_categories' => 'Enable filter products by categories',
             'enable_filter_products_by_brands' => 'Enable filter products by brands',
             'enable_filter_products_by_tags' => 'Enable filter products by tags',
             'enable_filter_products_by_attributes' => 'Enable filter products by attributes',
+            'enable_filter_products_by_price' => 'Enable filter products by price',
+            'max_product_price_for_filter' => 'Max product price for filter',
+            'max_product_price_for_filter_placeholder' => 'If it is empty or zero, it will get the max product price from your existing products.',
+            'max_product_price_for_filter_helper' => 'You can set a fixed price for this or it will dynamically get the max product price from your existing products. Currently it is :price.',
         ],
     ],
     'digital_product' => [
@@ -126,6 +131,8 @@ return [
             'cart_page' => 'Cart page',
             'cart_destroy_on_logout' => 'Destroy cart on logout',
             'cart_destroy_on_logout_helper' => 'The cart will be destroyed when the customer logs out.',
+            'hide_product_price' => 'Hide product price',
+            'hide_product_price_helper' => 'This option just work if you disable shopping cart, turning your site into a catalog-only display. If enabled, the product price will be hidden. It is useful when you want to hide the price and require customers to contact you for the price.',
         ],
     ],
     'checkout' => [
@@ -148,6 +155,7 @@ return [
             'all' => 'All',
             'all_helper_text' => 'If you uncheck all countries, it will apply for all countries.',
             'enable_guest_checkout' => 'Enable guest checkout',
+            'enable_guest_checkout_helper' => 'If enabled, customers can place an order without creating an account.',
             'recently_viewed' => [
                 'enable' => 'Enable customer recently viewed products',
                 'max' => 'Maximum number of customer recently viewed products',
@@ -232,6 +240,8 @@ return [
             'enabled_customer_account_deletion_helper' => 'When it is enabled, customers can delete their account in customer dashboard → Account settings.',
             'enabled_customer_dob_field' => 'Enable customer date of birth field',
             'enabled_customer_dob_field_helper' => 'When it is enabled, customers can enter their date of birth in customer dashboard → Account settings.',
+            'enabled_phone_field_in_registration_form' => 'Enable phone field in registration form',
+            'enabled_phone_field_in_registration_form_helper' => 'When it is enabled, phone field will be added to the registration form.',
             'make_customer_phone_number_required' => 'Make customer phone number required',
             'make_customer_phone_number_required_helper' => 'When enabled, customers must enter their phone number during registration. It is always required for customers logging in with a phone number.',
         ],

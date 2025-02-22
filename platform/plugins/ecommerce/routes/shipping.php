@@ -7,7 +7,7 @@ AdminHelper::registerRoutes(function (): void {
     Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers', 'prefix' => 'ecommerce'], function (): void {
         Route::group([
             'prefix' => 'shipping-methods',
-            'permission' => 'settings.index.shipping',
+            'permission' => 'ecommerce.settings.shipping',
             'as' => 'shipping_methods.',
         ], function (): void {
             Route::post('region/create', [
@@ -48,7 +48,7 @@ AdminHelper::registerRoutes(function (): void {
             Route::group([
                 'prefix' => 'shipping-rule-items',
                 'as' => 'shipping-rule-items.',
-                'permission' => 'settings.index.shipping',
+                'permission' => 'ecommerce.settings.shipping',
             ], function (): void {
                 Route::resource('', 'ShippingRuleItemController')->parameters(['' => 'item']);
 

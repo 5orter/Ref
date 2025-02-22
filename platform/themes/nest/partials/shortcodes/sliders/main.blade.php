@@ -20,16 +20,7 @@
                                             <div class="slider-1-height-3 slider-animated-1">
                                                 {!! Theme::partial('shortcodes.sliders.content', compact('slider', 'shortcode')) !!}
                                                 <div class="slider-img">
-                                                    @php
-                                                        $tabletImage = $slider->getMetaData('tablet_image', true) ?: $slider->image;
-                                                        $mobileImage = $slider->getMetaData('mobile_image', true) ?: $tabletImage;
-                                                    @endphp
-                                                    <picture>
-                                                        <source srcset="{{ RvMedia::getImageUrl($slider->image, null, false, RvMedia::getDefaultImage()) }}" media="(min-width: 1200px)" />
-                                                        <source srcset="{{ RvMedia::getImageUrl($tabletImage, null, false, RvMedia::getDefaultImage()) }}" media="(min-width: 768px)" />
-                                                        <source srcset="{{ RvMedia::getImageUrl($mobileImage, null, false, RvMedia::getDefaultImage()) }}" media="(max-width: 767px)" />
-                                                        <img src="{{ RvMedia::getImageUrl($slider->image, null, false, RvMedia::getDefaultImage()) }}" alt="image">
-                                                    </picture>
+                                                    @include('plugins/simple-slider::includes.image')
                                                 </div>
                                             </div>
                                         </div>
@@ -62,10 +53,17 @@
             </div>
         </section>
     @elseif ($style == 'style-2')
+        @php
+            $ads = [];
+
+            if (is_plugin_active('ads')) {
+                $ads = get_ads_keys_from_shortcode($shortcode);
+            }
+        @endphp
         <section class="home-slider style-2 position-relative mb-50" @if ($shortcode->cover_image) style="background-image: url({{ RvMedia::getImageUrl($shortcode->cover_image) }}) !important;" @endif>
             <div class="container">
                 <div class="row">
-                    <div class="col-xl-8 col-lg-12">
+                    <div @class(['col-lg-12', 'col-xl-8' => ! empty($ads)])>
                         <div class="home-slide-cover">
                             <div class="hero-slider-1 style-4 dot-style-1 dot-style-1-position-1">
                                 @foreach($sliders as $slider)
@@ -94,17 +92,25 @@
                             <div class="slider-arrow hero-slider-1-arrow"></div>
                         </div>
                     </div>
-                    <div class="col-lg-4 d-none d-xl-block">
-                        @if (is_plugin_active('ads'))
-                            @foreach (get_ads_keys_from_shortcode($shortcode) as $key)
+                    @if (! empty($ads))
+                        <div class="col-lg-4 d-none d-xl-block">
+                            @foreach ($ads as $key)
                                 {!! display_ad($key) !!}
                             @endforeach
-                        @endif
-                    </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </section>
     @elseif ($style == 'style-5')
+        @php
+            $ads = [];
+
+            if (is_plugin_active('ads')) {
+                $ads = get_ads_keys_from_shortcode($shortcode);
+            }
+        @endphp
+
         <section class="home-slider position-relative mb-30">
             <div class="container">
                 <div class="row">
@@ -112,7 +118,7 @@
                         @php
                             $categories = ! is_plugin_active('ecommerce') ? collect() : ProductCategoryHelper::getActiveTreeCategories();
                         @endphp
-                        @if ($categories->count())
+                        @if ($categories->isNotEmpty())
                             <div class="categories-dropdown-wrap style-2 font-heading mt-30">
                                 <div class="d-flex categori-dropdown-inner">
                                     <ul>
@@ -152,7 +158,7 @@
                             </div>
                         @endif
                     </div>
-                    <div class="col-lg-7">
+                    <div @class(['col-xl-7' => ! empty($ads), 'col-xl-10' => empty($ads)])>
                         <div class="home-slide-cover mt-30">
                             <div class="hero-slider-1 style-5 dot-style-1 dot-style-1-position-2">
                                 @foreach($sliders as $slider)
@@ -181,17 +187,17 @@
                             <div class="slider-arrow hero-slider-1-arrow"></div>
                         </div>
                     </div>
-                    <div class="col-lg-3">
-                        <div class="row mt-20">
-                            @if (is_plugin_active('ads'))
-                                @foreach (get_ads_keys_from_shortcode($shortcode) as $key)
+                    @if (! empty($ads))
+                        <div class="col-lg-3">
+                            <div class="row mt-20">
+                                @foreach ($ads as $key)
                                     <div class="col-md-6 col-lg-12 mt-10">
                                         {!! display_ad($key, 'banner-' . ($loop->index + 1)) !!}
                                     </div>
                                 @endforeach
-                            @endif
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </section>

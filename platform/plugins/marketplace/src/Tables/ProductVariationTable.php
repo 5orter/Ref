@@ -21,7 +21,7 @@ class ProductVariationTable extends EcommerceProductVariationTable
                 return Html::tag(
                     'label',
                     Form::radio('variation_default_id', $item->getKey(), $item->is_default, [
-                        'data-url' => route('products.set-default-product-variation', $item->getKey()),
+                        'data-url' => route('marketplace.vendor.products.set-default-product-variation', $item->getKey()),
                         'data-bs-toggle' => 'tooltip',
                         'title' => trans('plugins/ecommerce::products.set_this_variant_as_default'),
                         'class' => 'form-check-input',

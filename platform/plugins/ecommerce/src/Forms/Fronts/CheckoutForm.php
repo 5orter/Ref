@@ -14,6 +14,7 @@ use Botble\Base\Forms\Fields\TextareaField;
 use Botble\Ecommerce\Facades\Cart;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Http\Requests\SaveCheckoutInformationRequest;
+use Botble\Theme\Facades\Theme;
 use Botble\Theme\FormFront;
 use Closure;
 use Illuminate\Support\Arr;
@@ -250,7 +251,7 @@ class CheckoutForm extends FormFront
                                         HtmlField::class,
                                         HtmlFieldOption::make()->content(apply_filters('ecommerce_checkout_form_after_tax_information_form', null, $model['products']))
                                     )
-                                    ->when(theme_option('ecommerce_term_and_privacy_policy_url') ?: theme_option('term_and_privacy_policy_url'), function (CheckoutForm $form, string $privacyPolicyUrl): void {
+                                    ->when(Theme::termAndPrivacyPolicyUrl(), function (CheckoutForm $form, string $privacyPolicyUrl): void {
                                         $form->add(
                                             'agree_terms_and_policy',
                                             CheckboxField::class,

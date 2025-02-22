@@ -111,16 +111,12 @@ class PublicController extends BaseController
                         })->all();
                 }
 
-                $form
-                    ->getModel()
-                    ->fill($data)
-                    ->save();
-
                 /**
                  * @var Contact $contact
                  */
-                $contact = $form
-                    ->getModel();
+                $contact = $form->getModel();
+
+                $contact->fill($data)->save();
 
                 event(new SentContactEvent($contact));
 
@@ -146,7 +142,7 @@ class PublicController extends BaseController
                 $args = ['replyTo' => is_array($receiverEmails) ? Arr::first($receiverEmails) : $receiverEmails];
 
                 $emailHandler->sendUsingTemplate('sender-confirmation', $contact->email, $args);
-            });
+            }, true);
 
             return $this
                 ->httpResponse()

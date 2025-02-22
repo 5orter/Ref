@@ -16,7 +16,7 @@
 
                         <div class="checkout__coupon-item-title">
                             @if ($discount->type_option !== 'shipping')
-                                <h4>{{ $discount->type_option === 'percentage' ? $discount->value . '%' : format_price($discount->value) }}</h4>
+                                <h4>{{ $discount->type_option == 'percentage' ? $discount->value . '%' : format_price($discount->value) }}</h4>
                             @endif
 
                             @if($discount->quantity > 0)

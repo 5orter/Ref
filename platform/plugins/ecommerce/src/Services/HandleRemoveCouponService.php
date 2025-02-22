@@ -30,7 +30,7 @@ class HandleRemoveCouponService
 
         $sessionData = OrderHelper::getOrderSessionData($token);
 
-        if ($discount && $discount->type_option === DiscountTypeOptionEnum::SHIPPING) {
+        if ($discount && $discount->type_option == DiscountTypeOptionEnum::SHIPPING) {
             Arr::set($sessionData, $prefix . 'is_free_shipping', false);
         }
 

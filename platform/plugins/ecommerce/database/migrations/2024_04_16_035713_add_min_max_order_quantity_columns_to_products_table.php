@@ -8,8 +8,8 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::table('ec_products', function (Blueprint $table): void {
-            $table->unsignedInteger('minimum_order_quantity')->default(0)->nullable();
-            $table->unsignedInteger('maximum_order_quantity')->default(0)->nullable();
+            $table->integer('minimum_order_quantity')->default(0)->nullable()->unsigned();
+            $table->integer('maximum_order_quantity')->default(0)->nullable()->unsigned();
         });
     }
 

@@ -17,6 +17,7 @@ return [
     'edit_this_category' => 'Edit this category',
     'export' => [
         'description' => 'Export product categories to Excel/CSV file.',
+        'total' => 'Total',
     ],
     'import' => [
         'description' => 'Import product categories from Excel/CSV file.',

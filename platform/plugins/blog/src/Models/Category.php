@@ -10,6 +10,7 @@ use Botble\Base\Models\BaseModel;
 use Botble\Base\Traits\HasTreeCategory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -47,7 +48,7 @@ class Category extends BaseModel implements HasTreeCategoryContract
     protected static function booted(): void
     {
         static::deleted(function (Category $category): void {
-            $category->children()->each(fn (Category $child) => $child->delete());
+            $category->children()->each(fn (Model $child) => $child->delete());
 
             $category->posts()->detach();
         });

@@ -92,6 +92,13 @@
                 data-counter="400"
             />
 
+            <x-core::form.on-off.checkbox
+                :label="trans('plugins/backup::backup.backup_only_db')"
+                :helperText="trans('plugins/backup::backup.backup_only_db_helper')"
+                name="backup_only_db"
+                :checked="false"
+            />
+
             <x-slot:footer>
                 <x-core::button
                     type="submit"

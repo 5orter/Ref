@@ -75,6 +75,28 @@ class MediaServiceProvider extends ServiceProvider
             ->loadRoutes()
             ->publishAssets();
 
+        $config = $this->app->make('config');
+        $setting = $this->app->make(SettingStore::class);
+
+        $config->set([
+            'core.media.media.chunk.enabled' => (bool) $setting->get(
+                'media_chunk_enabled',
+                $config->get('core.media.media.chunk.enabled')
+            ),
+            'core.media.media.chunk.chunk_size' => (int) $setting->get(
+                'media_chunk_size',
+                $config->get('core.media.media.chunk.chunk_size')
+            ),
+            'core.media.media.chunk.max_file_size' => (int) $setting->get(
+                'media_max_file_size',
+                $config->get('core.media.media.chunk.max_file_size')
+            ),
+        ]);
+
+        if (! $config->get('core.media.media.use_storage_symlink')) {
+            RvMedia::setUploadPathAndURLToPublic();
+        }
+
         $this->app->resolving(FilesystemManager::class, function (): void {
             Storage::extend('wasabi', function ($app, $config) {
                 $config['url'] = 'https://' . $config['bucket'] . '.s3.' . $config['region'] . '.wasabisys.com/';
@@ -125,18 +147,6 @@ class MediaServiceProvider extends ServiceProvider
             $config->set([
                 'filesystems.default' => $mediaDriver,
                 'filesystems.disks.public.throw' => true,
-                'core.media.media.chunk.enabled' => (bool) $setting->get(
-                    'media_chunk_enabled',
-                    $config->get('core.media.media.chunk.enabled')
-                ),
-                'core.media.media.chunk.chunk_size' => (int) $setting->get(
-                    'media_chunk_size',
-                    $config->get('core.media.media.chunk.chunk_size')
-                ),
-                'core.media.media.chunk.max_file_size' => (int) $setting->get(
-                    'media_max_file_size',
-                    $config->get('core.media.media.chunk.max_file_size')
-                ),
             ]);
 
             switch ($mediaDriver) {
@@ -214,10 +224,6 @@ class MediaServiceProvider extends ServiceProvider
                     break;
             }
         });
-
-        if (! $this->app['config']->get('core.media.media.use_storage_symlink')) {
-            RvMedia::setUploadPathAndURLToPublic();
-        }
 
         DashboardMenu::default()->beforeRetrieving(function (): void {
             DashboardMenu::make()

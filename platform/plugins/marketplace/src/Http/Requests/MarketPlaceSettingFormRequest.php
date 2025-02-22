@@ -5,6 +5,8 @@ namespace Botble\Marketplace\Http\Requests;
 use Botble\Base\Rules\OnOffRule;
 use Botble\Ecommerce\Http\Requests\ProductRequest as BaseProductRequest;
 use Botble\Marketplace\Enums\PayoutPaymentMethodsEnum;
+use Botble\Media\Facades\RvMedia;
+use Illuminate\Validation\Rule;
 
 class MarketPlaceSettingFormRequest extends BaseProductRequest
 {
@@ -45,6 +47,8 @@ class MarketPlaceSettingFormRequest extends BaseProductRequest
             'term_and_privacy_policy_url' => ['nullable', 'string'],
             'single_vendor_checkout' => [new OnOffRule()],
             'display_order_total_info_for_each_store' => [new OnOffRule()],
+            'media_mime_types_allowed' => ['nullable', 'array'],
+            'media_mime_types_allowed.*' => ['nullable', 'string', Rule::in(explode(',', RvMedia::getConfig('allowed_mime_types')))],
         ];
 
         if ($this->input('enable_commission_fee_for_each_category')) {

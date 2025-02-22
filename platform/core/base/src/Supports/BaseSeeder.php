@@ -58,7 +58,12 @@ class BaseSeeder extends Seeder
         $files = [];
 
         foreach (File::allFiles($folderPath) as $file) {
-            $files[] = RvMedia::uploadFromPath($file, 0, $folder);
+            try {
+                $files[] = RvMedia::uploadFromPath($file, 0, $folder);
+            } catch (Throwable $exception) {
+                $this->command->warn('Error when uploading file: ' . $file->getRealPath());
+                $this->command->warn($exception->getMessage());
+            }
         }
 
         return $files;

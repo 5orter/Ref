@@ -11,11 +11,13 @@ use Botble\Base\Forms\Fields\OnOffCheckboxField;
 use Botble\Base\Forms\Fields\PasswordField;
 use Botble\Base\Forms\Fields\PhoneNumberField;
 use Botble\Base\Forms\Fields\TextField;
+use Botble\Base\Forms\FormAbstract;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Forms\Fronts\Auth\FieldOptions\EmailFieldOption;
 use Botble\Ecommerce\Forms\Fronts\Auth\FieldOptions\TextFieldOption;
 use Botble\Ecommerce\Http\Requests\RegisterRequest;
 use Botble\Ecommerce\Models\Customer;
+use Botble\Theme\Facades\Theme;
 
 class RegisterForm extends AuthForm
 {
@@ -58,20 +60,23 @@ class RegisterForm extends AuthForm
                     ->icon('ti ti-mail')
                     ->addAttribute('autocomplete', 'email')
             )
-            ->add(
-                'phone',
-                PhoneNumberField::class,
-                TextFieldOption::make()
-                    ->label(__('Phone (optional)'))
-                    ->when(EcommerceHelper::isLoginUsingPhone() || get_ecommerce_setting('make_customer_phone_number_required', false), function (TextFieldOption $fieldOption): void {
-                        $fieldOption
-                            ->required()
-                            ->label(__('Phone'));
-                    })
-                    ->placeholder(__('Phone number'))
-                    ->icon('ti ti-phone')
-                    ->addAttribute('autocomplete', 'tel')
-            )
+            ->when(get_ecommerce_setting('enabled_phone_field_in_registration_form', true), static function (FormAbstract $form) {
+                $form
+                    ->add(
+                        'phone',
+                        PhoneNumberField::class,
+                        TextFieldOption::make()
+                            ->label(__('Phone (optional)'))
+                            ->when(EcommerceHelper::isLoginUsingPhone() || get_ecommerce_setting('make_customer_phone_number_required', false), static function (TextFieldOption $fieldOption): void {
+                                $fieldOption
+                                    ->required()
+                                    ->label(__('Phone'));
+                            })
+                            ->placeholder(__('Phone number'))
+                            ->icon('ti ti-phone')
+                            ->addAttribute('autocomplete', 'tel')
+                    );
+            })
             ->add(
                 'password',
                 PasswordField::class,
@@ -93,7 +98,7 @@ class RegisterForm extends AuthForm
                 OnOffCheckboxField::class,
                 CheckboxFieldOption::make()
                     ->when(
-                        $privacyPolicyUrl = theme_option('ecommerce_term_and_privacy_policy_url') ?: theme_option('term_and_privacy_policy_url'),
+                        $privacyPolicyUrl = Theme::termAndPrivacyPolicyUrl(),
                         function (CheckboxFieldOption $fieldOption, string $url): void {
                             $fieldOption->label(__('I agree to the :link', ['link' => Html::link($url, __('Terms and Privacy Policy'), attributes: ['class' => 'text-decoration-underline', 'target' => '_blank'])]));
                         }

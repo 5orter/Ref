@@ -35,7 +35,6 @@ class ProductCategoriesWidget extends AbstractWidget
             ->orderBy('order')
             ->orderByDesc('created_at')
             ->with(['slugable'])
-            ->withCount('products')
             ->limit((int) $this->getConfig('number_display', 10) ?: 10)
             ->get();
 

@@ -134,7 +134,9 @@ class PublicController extends BaseController
 
                 $model->fill($request->except(['email']));
 
-                $model->dob = Carbon::createFromFormat(BaseHelper::getDateFormat(), $request->input('dob'));
+                if (get_ecommerce_setting('enabled_customer_dob_field', true) && $request->has('dob')) {
+                    $model->dob = Carbon::createFromFormat(BaseHelper::getDateFormat(), $request->input('dob'));
+                }
 
                 $model->save();
 

@@ -104,7 +104,13 @@ class LanguageManager
                 is_in_admin() ||
                 ! in_array($language->lang_id, json_decode(setting('language_hide_languages', '[]'), true))
             ) {
-                $locales[$language->lang_locale] = [
+                $key = $language->lang_locale;
+
+                if (isset($locales[$key])) {
+                    $key = $language->lang_code;
+                }
+
+                $locales[$key] = [
                     'lang_name' => $language->lang_name,
                     'lang_locale' => $language->lang_locale,
                     'lang_code' => $language->lang_code,

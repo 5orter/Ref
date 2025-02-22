@@ -504,7 +504,7 @@ class OrderController extends BaseController
 
         $taxInformation->update($validated);
 
-        abort_if($taxInformation->order->status === OrderStatusEnum::CANCELED, 401);
+        abort_if($taxInformation->order->status == OrderStatusEnum::CANCELED, 401);
 
         return $this
             ->httpResponse()
@@ -815,7 +815,7 @@ class OrderController extends BaseController
             $customer->avatar = (string) $customer->avatar_url;
 
             if ($customer) {
-                $customerOrderNumbers = $customer->orders()->count();
+                $customerOrderNumbers = $customer->completedOrders()->count();
             }
 
             $customerAddresses = CustomerAddressResource::collection($customer->addresses);
@@ -874,18 +874,22 @@ class OrderController extends BaseController
         CreatePaymentForOrderService $createPaymentForOrderService
     ) {
         DB::transaction(function () use ($order, $createPaymentForOrderService, $request): void {
-            /** @var User $user */
+            /**
+             * @var User $user
+             */
             $user = Auth::user();
 
             $order->update(['is_finished' => true]);
 
-            $createPaymentForOrderService->execute(
-                $order,
-                $request->input('payment_method'),
-                $request->input('payment_status'),
-                $order->user_id != 0 ? $order->user_id : null,
-                $request->input('transaction_id')
-            );
+            if (is_plugin_active('payment')) {
+                $createPaymentForOrderService->execute(
+                    $order,
+                    $request->input('payment_method'),
+                    $request->input('payment_status'),
+                    $order->user_id != 0 ? $order->user_id : null,
+                    $request->input('transaction_id')
+                );
+            }
 
             $order->histories()->create([
                 'order_id' => $order->getKey(),

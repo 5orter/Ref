@@ -21,7 +21,7 @@
                                 <img class="img-grey-hover" src="{{ RvMedia::getImageUrl($brand->logo, null, false, RvMedia::getDefaultImage()) }}" alt="{{ $brand->name }}"/>
                             </a>
                         @endif
-                            <a href="{{ $brand->url }}">{{ $brand->name }}</a> ({{ $brand->products_count }})
+                            <a href="{{ $brand->url }}">{{ $brand->name }}</a> {{ $brand->products_count ? '('. $brand->products_count .')' : '' }}
                     </div>
                 @endforeach
             </div>

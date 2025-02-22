@@ -13,5 +13,5 @@ namespace App\Contracts\ClientAPI;
  */
 interface Client
 {
-    public function request($method, $uri, array $options = []);
+    public function request(string $method, string $url, array $options = []);
 }

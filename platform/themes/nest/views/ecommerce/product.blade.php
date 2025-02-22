@@ -307,7 +307,7 @@
     @php
         $relatedProducts = get_related_products($product);
     @endphp
-    @if (count($crossSellProducts) > 0)
+    @if (count($relatedProducts) > 0)
         <div class="mt-60">
             <h3 class="section-title style-1 mb-30">{{ __('Related products') }}</h3>
 

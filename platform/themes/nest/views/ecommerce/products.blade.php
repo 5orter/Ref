@@ -63,19 +63,12 @@
             @endif
             <div class="col-xl-3 primary-sidebar mt-4">
                 <div class="widget-area">
-                    <form action="{{ URL::current() }}" method="GET" id="products-filter-ajax">
-                        <input type="hidden" name="page" data-value="{{ $products->currentPage() }}">
-                        <input type="hidden" name="sort-by" value="{{ BaseHelper::stringify(request()->input('sort-by')) }}">
-                        <input type="hidden" name="num" value="{{ BaseHelper::stringify(request()->input('num')) }}">
-                        <input type="hidden" name="q" value="{{ BaseHelper::stringify(request()->input('q')) }}">
-
-                        @include(Theme::getThemeNamespace('views.ecommerce.includes.filters'))
-                    </form>
+                    @include(Theme::getThemeNamespace('views.ecommerce.includes.filters'))
                 </div>
             </div>
             <div class="col-lg-9">
                 <div class="mt-4">
-                    <div class="products-listing position-relative">
+                    <div class="products-listing position-relative bb-product-items-wrapper">
                         @include(Theme::getThemeNamespace() . '::views.ecommerce.includes.product-items', compact('products'))
                     </div>
                 </div>
@@ -94,21 +87,14 @@
             @endif
             <div class="col-lg-9">
                 <div class="mt-4">
-                    <div class="products-listing position-relative">
+                    <div class="products-listing position-relative bb-product-items-wrapper">
                         @include(Theme::getThemeNamespace() . '::views.ecommerce.includes.product-items', compact('products'))
                     </div>
                 </div>
             </div>
             <div class="col-xl-3 primary-sidebar mt-4">
                 <div class="widget-area">
-                    <form action="{{ URL::current() }}" method="GET" id="products-filter-ajax">
-                        <input type="hidden" name="page" data-value="{{ $products->currentPage() }}">
-                        <input type="hidden" name="sort-by" value="{{ BaseHelper::stringify(request()->input('sort-by')) }}">
-                        <input type="hidden" name="num" value="{{ BaseHelper::stringify(request()->input('num')) }}">
-                        <input type="hidden" name="q" value="{{ BaseHelper::stringify(request()->input('q')) }}">
-
-                        @include(Theme::getThemeNamespace('views.ecommerce.includes.filters'))
-                    </form>
+                    @include(Theme::getThemeNamespace('views.ecommerce.includes.filters'))
                 </div>
             </div>
         @endif

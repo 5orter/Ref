@@ -131,7 +131,7 @@ class ProductSpecificationSeeder extends BaseSeeder
 
     protected function generateAttributeValue(SpecificationAttribute $attribute)
     {
-        return match ($attribute->type) {
+        return match ($attribute->type->getValue()) {
             SpecificationAttributeFieldType::TEXT => $this->fake()->randomFloat(2, 1, 100) . ' cm',
             SpecificationAttributeFieldType::SELECT, SpecificationAttributeFieldType::RADIO => $this->fake()->randomElement($attribute->options),
             SpecificationAttributeFieldType::CHECKBOX => $this->fake()->boolean(),

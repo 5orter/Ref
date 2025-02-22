@@ -5,15 +5,15 @@ namespace Botble\Theme\Providers;
 use Botble\Base\Facades\AdminAppearance;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Facades\Html;
-use Botble\Base\Forms\FieldOptions\CodeEditorFieldOption;
 use Botble\Base\Forms\FieldOptions\MediaFileFieldOption;
 use Botble\Base\Forms\FieldOptions\SelectFieldOption;
-use Botble\Base\Forms\Fields\CodeEditorField;
+use Botble\Base\Forms\FieldOptions\TextareaFieldOption;
 use Botble\Base\Forms\Fields\MediaFileField;
 use Botble\Base\Forms\Fields\NumberField;
 use Botble\Base\Forms\Fields\OnOffCheckboxField;
 use Botble\Base\Forms\Fields\RadioField;
 use Botble\Base\Forms\Fields\SelectField;
+use Botble\Base\Forms\Fields\TextareaField;
 use Botble\Base\Forms\Fields\TextField;
 use Botble\Base\Forms\FormAbstract;
 use Botble\Base\Rules\OnOffRule;
@@ -142,6 +142,20 @@ class HookServiceProvider extends ServiceProvider
                                 ],
                             ],
                             [
+                                'id' => 'site_title_separator',
+                                'section_id' => 'opt-text-subsection-general',
+                                'type' => 'customSelect',
+                                'label' => trans('packages/theme::theme.site_title_separator'),
+                                'attributes' => [
+                                    'name' => 'site_title_separator',
+                                    'list' => [
+                                        '-' => __('- (dash)'),
+                                        '|' => __('| (pipe)'),
+                                    ],
+                                    'value' => '-',
+                                ],
+                            ],
+                            [
                                 'id' => 'seo_title',
                                 'type' => 'text',
                                 'label' => trans('core/setting::setting.general.seo_title'),
@@ -178,7 +192,7 @@ class HookServiceProvider extends ServiceProvider
                                         true => trans('packages/theme::theme.seo_index_options.index'),
                                         false => trans('packages/theme::theme.seo_index_options.no_index'),
                                     ],
-                                    'default' => true,
+                                    'value' => true,
                                 ],
                                 'helper' => trans('packages/theme::theme.theme_option_seo_index_helper'),
                             ],
@@ -410,14 +424,14 @@ class HookServiceProvider extends ServiceProvider
                     return ShortcodeForm::createFromArray($attributes)
                         ->add(
                             'content',
-                            CodeEditorField::class,
-                            CodeEditorFieldOption::make()
+                            TextareaField::class,
+                            TextareaFieldOption::make()
                                 ->label(__('Content'))
                                 ->placeholder(__('HTML code'))
                                 ->rows(3)
                                 ->addAttribute('data-shortcode-attribute', 'content')
                                 ->value($content)
-                                ->mode('html')
+                                ->maxLength(100000)
                         );
                 });
             }

@@ -24,7 +24,7 @@
                     <div class="col-xl-4 col-lg-6 text-center d-none d-xl-block">
                         <div class="hotline d-lg-inline-flex w-full align-items-center justify-content-center">
                             <img src="{{ Theme::asset()->url('imgs/theme/icons/phone-call.svg') }}" alt="hotline" />
-                            <p>{{ $hotline }} <span>{{ __('24/7 Support Center') }}</span></p>
+                            <p>{{ $hotline }} <span>{{ theme_option('hotline_subtitle_text') ?: __('24/7 Support Center') }}</span></p>
                         </div>
                     </div>
                 @endif

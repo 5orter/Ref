@@ -33,7 +33,7 @@ class DashboardController extends BaseController
                     $query
                         ->where('user_id', $request->user()->getKey())
                         ->select(['status', 'order', 'settings', 'widget_id'])
-                        ->orderBy('order');
+                        ->oldest('order');
                 },
             ])
             ->select(['id', 'name'])

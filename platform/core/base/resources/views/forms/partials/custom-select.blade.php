@@ -5,6 +5,8 @@
     if ($optionsAttributes && ! is_array($optionsAttributes)) {
         $optionsAttributes = [];
     }
+
+    $selectAttributes['id'] = Arr::get($selectAttributes, 'id', $name . '-select-' . rand(10000, 99999));
 @endphp
 
 {!! Form::select(

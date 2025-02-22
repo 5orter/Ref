@@ -1,4 +1,8 @@
-<div class="mb-3">
+@php
+    $wrapperAttributes = $wrapperAttributes ?? ['class' => 'mb-3'];
+@endphp
+
+<div {!! Html::attributes($wrapperAttributes) !!}>
     <div class="mb-3">
         <label class="form-label">{{ __('Quantity') }}</label>
         {!! Form::customSelect($tabKey ? "{$tabKey}_quantity" : 'quantity', $choices, $current, [

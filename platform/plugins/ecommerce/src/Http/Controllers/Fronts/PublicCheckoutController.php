@@ -89,7 +89,11 @@ class PublicCheckoutController extends BaseController
             $request->input('error') == 1 &&
             $request->input('error_type') == 'payment'
         ) {
-            $request->session()->flash('error_msg', __('Payment failed!'));
+            $message = $request->input('error_message') ?: __('Payment failed! Something wrong with your payment. Please try again.');
+
+            $request->session()->flash('error_msg', $message);
+
+            return redirect()->to(route('public.checkout.information', $token))->with('error_msg', $message);
         }
 
         $sessionCheckoutData = OrderHelper::getOrderSessionData($token);
@@ -430,7 +434,7 @@ class PublicCheckoutController extends BaseController
                     'order_id' => $sessionData['created_order_id'],
                     'product_id' => $cartItem->id,
                     'product_name' => $cartItem->name,
-                    'product_image' => $product->original_product->image,
+                    'product_image' => $cartItem->options['image'],
                     'qty' => $cartItem->qty,
                     'weight' => $weight,
                     'price' => $cartItem->price,
@@ -576,8 +580,10 @@ class PublicCheckoutController extends BaseController
                 );
         }
 
-        if (($maximumQuantity = EcommerceHelper::getMaximumOrderQuantity()) > 0
-            && $totalQuality > $maximumQuantity) {
+        if (
+            ($maximumQuantity = EcommerceHelper::getMaximumOrderQuantity()) > 0
+            && $totalQuality > $maximumQuantity
+        ) {
             return $this
                 ->httpResponse()
                 ->setError()
@@ -596,8 +602,7 @@ class PublicCheckoutController extends BaseController
                     __('Minimum order amount is :amount, you need to buy more :more to place an order!', [
                         'amount' => format_price(EcommerceHelper::getMinimumOrderAmount()),
                         'more' => format_price(
-                            EcommerceHelper::getMinimumOrderAmount() - Cart::instance('cart')
-                                ->rawSubTotal()
+                            EcommerceHelper::getMinimumOrderAmount() - Cart::instance('cart')->rawSubTotal()
                         ),
                     ])
                 );
@@ -800,7 +805,7 @@ class PublicCheckoutController extends BaseController
                 'order_id' => $order->getKey(),
                 'product_id' => $cartItem->id,
                 'product_name' => $cartItem->name,
-                'product_image' => $product->original_product->image,
+                'product_image' => $cartItem->options['image'],
                 'qty' => $cartItem->qty,
                 'weight' => Arr::get($cartItem->options, 'weight', 0),
                 'price' => $cartItem->price,
@@ -880,16 +885,8 @@ class PublicCheckoutController extends BaseController
         $order = Order::query()
             ->where('token', $token)
             ->with(['address', 'products', 'taxInformation'])
-            ->orderByDesc('id')
+            ->latest('id')
             ->firstOrFail();
-
-        if (is_plugin_active('payment') && (float) $order->amount && ! $order->payment_id) {
-            return $this
-                ->httpResponse()
-                ->setError()
-                ->setNextUrl(PaymentHelper::getCancelURL())
-                ->setMessage(__('Payment failed!'));
-        }
 
         if (session('tracked_start_checkout')) {
             app(GoogleTagManager::class)->purchase($order);

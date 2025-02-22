@@ -196,4 +196,6 @@ return [
     'share_results' => 'Share Results',
     'download_image_to_local_storage' => 'Download image to local storage',
     'download_image_to_local_storage_helper' => 'If it is unchecked, the image will be displayed from the original URL',
+    'skip_trash' => 'Skip trash',
+    'skip_trash_description' => 'If it is checked, the file will be deleted permanently without moving to trash',
 ];

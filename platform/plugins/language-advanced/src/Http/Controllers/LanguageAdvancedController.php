@@ -69,6 +69,7 @@ class LanguageAdvancedController extends BaseController
 
         return $this
             ->httpResponse()
+            ->usePreviousRouteName()
             ->withUpdatedSuccessMessage();
     }
 }

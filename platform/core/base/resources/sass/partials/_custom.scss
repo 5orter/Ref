@@ -88,6 +88,7 @@
     --bb-btn-padding-x: 0.5rem;
     --bb-btn-border-radius: 0.25rem;
     --bb-btn-icon-size: 1.25rem;
+    --bb-btn-line-height: 1.5;
 }
 
 .dropdown-submenu {
@@ -394,4 +395,21 @@ a.form-hint, .form-hint a {
 
 .toastify-text {
     word-break: break-word;
+}
+
+.flag {
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+}
+
+.form-control-disabled {
+    background-color: var(--bb-bg-surface-secondary);
+    opacity: 1;
+}
+
+.card.theme-option {
+    .dropdown-menu {
+        z-index: 999;
+    }
 }

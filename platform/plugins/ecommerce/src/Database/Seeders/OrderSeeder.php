@@ -244,7 +244,7 @@ class OrderSeeder extends BaseSeeder
                 /**
                  * @var StoreLocator|null $storeLocator
                  */
-                $storeLocator = $storeLocatorsCount > 1 ? $storeLocators->random(1) : null;
+                $storeLocator = $storeLocatorsCount > 1 ? $storeLocators->random() : null;
 
                 if ($isAvailableShipping) {
                     $shipment = Shipment::query()->create([

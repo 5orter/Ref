@@ -163,7 +163,7 @@ class BlogServiceProvider extends ServiceProvider
                 );
         });
 
-        if (defined('LANGUAGE_MODULE_SCREEN_NAME')) {
+        if (defined('LANGUAGE_MODULE_SCREEN_NAME') && defined('LANGUAGE_ADVANCED_MODULE_SCREEN_NAME')) {
             if (
                 defined('LANGUAGE_ADVANCED_MODULE_SCREEN_NAME') &&
                 $this->app['config']->get('plugins.blog.general.use_language_v2')

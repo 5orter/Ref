@@ -78,4 +78,5 @@ return [
         ],
     ],
     'term_and_privacy_policy_url' => 'Terms and Privacy Policy URL',
+    'site_title_separator' => 'SEO title separator',
 ];

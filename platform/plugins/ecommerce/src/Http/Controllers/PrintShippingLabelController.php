@@ -58,11 +58,11 @@ class PrintShippingLabelController extends BaseController
 
         if (EcommerceHelper::loadCountriesStatesCitiesFromPluginLocation()) {
             if (is_numeric($state)) {
-                $state = State::query()->wherePublished()->where('id', $state)->value('name');
+                $state = State::query()->where('id', $state)->value('name');
             }
 
             if (is_numeric($city)) {
-                $city = City::query()->wherePublished()->where('id', $city)->value('name');
+                $city = City::query()->where('id', $city)->value('name');
             }
         }
 

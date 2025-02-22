@@ -20,7 +20,7 @@ class ShippingManagement {
                     _method: 'DELETE',
                     id: _self.data('id'),
                 })
-                .then(({ data }) => {
+                .then(({data}) => {
                     if (!data.error) {
                         $(`.wrap-table-shipping-${_self.data('id')}`).remove()
 
@@ -56,12 +56,19 @@ class ShippingManagement {
                     _method: 'DELETE',
                     id: _self.data('id'),
                 })
-                .then(({ data }) => {
+                .then(({data}) => {
                     if (!data.error) {
                         $(`.box-table-shipping-item-${_self.data('id')}`).remove()
                         if (data.data.count === 0) {
                             $(`.wrap-table-shipping-${data.data.shipping_id}`).remove()
                         }
+
+                        if (!$('.shipping-options-wrapper .shipping-option-item').length) {
+                            $('form').areYouSure({'silent': true});
+
+                            window.location.reload()
+                        }
+
                         Botble.showSuccess(data.message)
                     } else {
                         Botble.showError(data.message)
@@ -102,18 +109,21 @@ class ShippingManagement {
                 .make()
                 .withButtonLoading(_self)
                 .post($form.prop('action'), formData)
-                .then(({ data }) => {
+                .then(({data}) => {
                     if (!data.error) {
                         Botble.showSuccess(data.message)
                         if (data?.data?.rule?.shipping_id && data?.data?.html) {
                             const $box = $(`.wrap-table-shipping-${data.data.rule.shipping_id}`)
-                            const $item = $box.find(`.box-table-shipping-item-${data.data.rule.id} .p-3`)
+                            const $item = $box.find(`.box-table-shipping-item-${data.data.rule.id}`)
 
                             if ($item.length) {
                                 $item.replaceWith(data.data.html)
                             } else {
                                 $box.append(data.data.html)
                             }
+
+                            $('.wrapper-content .empty').remove();
+
                             Botble.initResources()
                         }
                     } else {
@@ -213,7 +223,7 @@ class ShippingManagement {
                 .make()
                 .withButtonLoading(_self)
                 .get(_self.data('url'))
-                .then(({ data }) => {
+                .then(({data}) => {
                     if (!data.error) {
                         $modal.find('.modal-body').html(data.data.html)
                         $modal.find('.modal-title strong').html(data.message)
@@ -248,7 +258,7 @@ class ShippingManagement {
                 .make()
                 .withButtonLoading(_self)
                 [method]($form.prop('action'), formData)
-                .then(({ data }) => {
+                .then(({data}) => {
                     if (!data.error) {
                         const $table = $(`.table-shipping-rule-${data.data.shipping_rule_id}`)
                         if ($table.find(`.shipping-rule-item-${data.data.id}`).length) {
@@ -283,7 +293,7 @@ class ShippingManagement {
                 .post(_self.data('url'), {
                     _method: 'DELETE',
                 })
-                .then(({ data }) => {
+                .then(({data}) => {
                     if (!data.error) {
                         const $table = $(`.table-shipping-rule-${data.data.shipping_rule_id}`)
                         if ($table.find(`.shipping-rule-item-${data.data.id}`).length) {
@@ -291,6 +301,7 @@ class ShippingManagement {
                                 $(this).remove()
                             })
                         }
+
                         Botble.showSuccess(data.message)
                     } else {
                         Botble.showError(data.message)
@@ -316,7 +327,7 @@ class ShippingManagement {
                 .make()
                 .withButtonLoading(_self)
                 .post($form.prop('action'), $form.serialize())
-                .then(({ data }) => {
+                .then(({data}) => {
                     Botble.showSuccess(data.message)
                     $('.wrapper-content').load(`${window.location.href} .wrapper-content > *`)
                     $('#select-country-modal').modal('hide')
@@ -397,7 +408,7 @@ class ShippingManagement {
             if (!isNaN(perPage) && perPage > 0) {
                 const $table = $this.closest('.table-shipping-rule-items')
                 const $th = $table.find('thead tr th[data-column][data-dir]')
-                const data = { per_page: perPage }
+                const data = {per_page: perPage}
 
                 if ($th.length) {
                     data.order_by = $th.data('column')
@@ -432,7 +443,7 @@ class ShippingManagement {
                 .make()
                 .withButtonLoading($button)
                 .get(url, data)
-                .then(({ data }) => {
+                .then(({data}) => {
                     if (!data.error) {
                         $table.replaceWith(data.data.html)
                     } else {

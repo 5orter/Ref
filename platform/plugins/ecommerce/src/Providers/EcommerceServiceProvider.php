@@ -1003,14 +1003,6 @@ class EcommerceServiceProvider extends ServiceProvider
                         ->withRoute('tools.data-synchronize.export.products.index')
                 )
                 ->registerItem(
-                    ImportPanelSection::class,
-                    fn () => PanelSectionItem::make('products')
-                        ->setTitle(trans('plugins/ecommerce::products.name'))
-                        ->withDescription(trans('plugins/ecommerce::products.import.description'))
-                        ->withPriority(90)
-                        ->withRoute('tools.data-synchronize.import.products.index')
-                )
-                ->registerItem(
                     ExportPanelSection::class,
                     fn () => PanelSectionItem::make('product-categories')
                         ->setTitle(trans('plugins/ecommerce::product-categories.name'))
@@ -1020,22 +1012,29 @@ class EcommerceServiceProvider extends ServiceProvider
                         ->withRoute('tools.data-synchronize.export.product-categories.index')
                 )
                 ->registerItem(
-                    ImportPanelSection::class,
-                    fn () => PanelSectionItem::make('product-categories')
-                        ->setTitle(trans('plugins/ecommerce::product-categories.name'))
-                        ->withDescription(trans('plugins/ecommerce::product-categories.import.description'))
-                        ->withPriority(120)
-                        ->withPermission('product-categories.import')
-                        ->withRoute('tools.data-synchronize.import.product-categories.index')
-                )
-                ->registerItem(
                     ExportPanelSection::class,
                     fn () => PanelSectionItem::make('orders')
-                        ->setTitle('Orders')
-                        ->withDescription('Export Orders data to a CSV or Excel file.')
+                        ->setTitle(trans('plugins/ecommerce::order.export_title'))
+                        ->withDescription(trans('plugins/ecommerce::order.export_description'))
                         ->withPriority(999)
                         ->withPermission('orders.export')
                         ->withRoute('tools.data-synchronize.export.orders.index')
+                )
+                ->registerItem(
+                    ImportPanelSection::class,
+                    fn () => PanelSectionItem::make('products')
+                        ->setTitle(trans('plugins/ecommerce::products.name'))
+                        ->withDescription(trans('plugins/ecommerce::products.import.description'))
+                        ->withPriority(90)
+                        ->withRoute('tools.data-synchronize.import.products.index')
+                )
+                ->registerItem(
+                    ImportPanelSection::class,
+                    fn () => PanelSectionItem::make('product-prices')
+                        ->setTitle(trans('plugins/ecommerce::product-prices.name'))
+                        ->withDescription(trans('plugins/ecommerce::product-prices.import.description'))
+                        ->withPriority(100)
+                        ->withRoute('ecommerce.product-prices.import.index')
                 )
                 ->registerItem(
                     ImportPanelSection::class,
@@ -1047,11 +1046,12 @@ class EcommerceServiceProvider extends ServiceProvider
                 )
                 ->registerItem(
                     ImportPanelSection::class,
-                    fn () => PanelSectionItem::make('product-prices')
-                        ->setTitle(trans('plugins/ecommerce::product-prices.name'))
-                        ->withDescription(trans('plugins/ecommerce::product-prices.import.description'))
-                        ->withPriority(100)
-                        ->withRoute('ecommerce.product-prices.import.index')
+                    fn () => PanelSectionItem::make('product-categories')
+                        ->setTitle(trans('plugins/ecommerce::product-categories.name'))
+                        ->withDescription(trans('plugins/ecommerce::product-categories.import.description'))
+                        ->withPriority(120)
+                        ->withPermission('product-categories.import')
+                        ->withRoute('tools.data-synchronize.import.product-categories.index')
                 );
         });
 

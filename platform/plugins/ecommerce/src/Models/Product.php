@@ -10,6 +10,7 @@ use Botble\Ecommerce\Enums\DiscountTargetEnum;
 use Botble\Ecommerce\Enums\DiscountTypeEnum;
 use Botble\Ecommerce\Enums\ProductTypeEnum;
 use Botble\Ecommerce\Enums\StockStatusEnum;
+use Botble\Ecommerce\Events\ProductQuantityUpdatedEvent;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Services\Products\UpdateDefaultProductService;
 use Botble\Faq\Models\Faq;
@@ -133,6 +134,8 @@ class Product extends BaseModel
         static::updated(function (Product $product): void {
             if ($product->is_variation && $product->original_product->defaultVariation->product_id == $product->getKey()) {
                 app(UpdateDefaultProductService::class)->execute($product);
+
+                ProductQuantityUpdatedEvent::dispatch($product);
             }
 
             if (! $product->is_variation && $product->variations()->exists()) {
@@ -331,13 +334,17 @@ class Product extends BaseModel
     protected function images(): Attribute
     {
         return Attribute::make(
-            get: function (?string $value): array {
+            get: function (array|string|null $value): array {
                 try {
                     if ($value === '[null]') {
                         return [];
                     }
 
-                    $images = json_decode((string) $value, true);
+                    $images = $value;
+
+                    if (! is_array($images)) {
+                        $images = json_decode((string) $value, true);
+                    }
 
                     if (is_array($images)) {
                         $images = array_filter($images);
@@ -427,9 +434,19 @@ class Product extends BaseModel
 
     public function canAddToCart(int $quantity): bool
     {
-        return ! $this->with_storehouse_management ||
-            ($this->quantity - $quantity) >= 0 ||
-            $this->allow_checkout_when_out_of_stock;
+        if ($this->max_cart_quantity < $quantity) {
+            return false;
+        }
+
+        if (! $this->with_storehouse_management) {
+            return true;
+        }
+
+        if (($this->quantity - $quantity) >= 0) {
+            return true;
+        }
+
+        return $this->alloDw_checkout_when_out_of_stock;
     }
 
     public function promotions(): BelongsToMany
@@ -786,5 +803,23 @@ class Product extends BaseModel
                 })
                 ->all();
         })->shouldCache();
+    }
+
+    protected function minCartQuantity(): Attribute
+    {
+        return Attribute::get(function () {
+            return $this->minimum_order_quantity ?: 1;
+        });
+    }
+
+    protected function maxCartQuantity(): Attribute
+    {
+        return Attribute::get(function () {
+            if ($this->maximum_order_quantity) {
+                return $this->maximum_order_quantity;
+            }
+
+            return $this->with_storehouse_management ? $this->quantity : 1000;
+        });
     }
 }

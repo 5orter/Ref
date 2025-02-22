@@ -46,6 +46,7 @@ class Order extends BaseModel
         'token',
         'completed_at',
         'proof_file',
+        'private_notes',
     ];
 
     protected $casts = [
@@ -163,6 +164,7 @@ class Order extends BaseModel
                 ShippingStatusEnum::ARRANGE_SHIPMENT,
                 ShippingStatusEnum::PENDING,
                 ShippingStatusEnum::NOT_APPROVED,
+                ShippingStatusEnum::APPROVED,
             ];
 
             return in_array($this->shipment->status, $pendingShippingStatuses);
@@ -178,6 +180,10 @@ class Order extends BaseModel
         }
 
         if ($this->shipment && $this->shipment->id) {
+            if ($this->shipment->status == ShippingStatusEnum::CANCELED) {
+                return true;
+            }
+
             $pendingShippingStatuses = [
                 ShippingStatusEnum::APPROVED,
                 ShippingStatusEnum::ARRANGE_SHIPMENT,

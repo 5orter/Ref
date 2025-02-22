@@ -10,7 +10,7 @@ Route::group(['namespace' => 'Botble\Contact\Http\Controllers'], function (): vo
         Route::group(['prefix' => 'contacts', 'as' => 'contacts.'], function (): void {
             Route::resource('', 'ContactController')->except(['create', 'store'])->parameters(['' => 'contact']);
 
-            Route::group(['prefix' => 'custom-fields', 'as' => 'custom-fields.', 'permission' => 'contacts.edit'], function (): void {
+            Route::group(['prefix' => 'custom-fields', 'as' => 'custom-fields.', 'permission' => 'contact.custom-fields'], function (): void {
                 Route::resource('', CustomFieldController::class)->parameters(['' => 'custom-field']);
             });
 

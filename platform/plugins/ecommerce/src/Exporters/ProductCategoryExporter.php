@@ -7,6 +7,7 @@ use Botble\DataSynchronize\Exporter\ExportColumn;
 use Botble\DataSynchronize\Exporter\ExportCounter;
 use Botble\DataSynchronize\Exporter\Exporter;
 use Botble\Ecommerce\Models\ProductCategory;
+use Botble\Media\Facades\RvMedia;
 use Illuminate\Support\Collection;
 
 class ProductCategoryExporter extends Exporter
@@ -37,7 +38,7 @@ class ProductCategoryExporter extends Exporter
     {
         return [
             ExportCounter::make()
-                ->label(trans('plugins/blog::posts.export.total'))
+                ->label(trans('plugins/ecommerce::product-categories.export.total'))
                 ->value(ProductCategory::query()->count()),
         ];
     }
@@ -49,6 +50,15 @@ class ProductCategoryExporter extends Exporter
 
     public function collection(): Collection
     {
-        return ProductCategory::query()->get();
+        return ProductCategory::query()
+            ->with(['slugable'])
+            ->get()
+            ->transform(fn (ProductCategory $item) => [ // @phpstan-ignore-line
+                ...$item->toArray(),
+                'slug' => $item->slugable->key,
+                'url' => $item->url,
+                'image' => RvMedia::getImageUrl($item->image),
+                'icon_image' => RvMedia::getImageUrl($item->icon_image),
+            ]);
     }
 }

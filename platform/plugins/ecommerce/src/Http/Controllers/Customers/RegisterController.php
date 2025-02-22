@@ -5,6 +5,7 @@ namespace Botble\Ecommerce\Http\Controllers\Customers;
 use Botble\ACL\Traits\RegistersUsers;
 use Botble\Base\Facades\BaseHelper;
 use Botble\Base\Http\Controllers\BaseController;
+use Botble\Ecommerce\Events\CustomerEmailVerified;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Ecommerce\Forms\Fronts\Auth\RegisterForm;
 use Botble\Ecommerce\Http\Requests\RegisterRequest;
@@ -119,6 +120,8 @@ class RegisterController extends BaseController
         $customer->save();
 
         $this->guard()->login($customer);
+
+        CustomerEmailVerified::dispatch($customer);
 
         return $this
             ->httpResponse()

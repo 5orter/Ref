@@ -68,7 +68,7 @@ class ProductImporter extends Importer implements WithMapping
 
     protected array $supportedLocales = [];
 
-    protected string $defaultLanguage;
+    protected ?string $defaultLanguage = null;
 
     protected bool $updateExisting = false;
 
@@ -90,8 +90,8 @@ class ProductImporter extends Importer implements WithMapping
         $this->allTaxes = Tax::query()->get();
         $this->barcodes = collect();
 
-        if (defined('LANGUAGE_MODULE_SCREEN_NAME')) {
-            $this->defaultLanguage = Language::getDefaultLanguage(['lang_code'])->lang_code;
+        if (defined('LANGUAGE_MODULE_SCREEN_NAME') && defined('LANGUAGE_ADVANCED_MODULE_SCREEN_NAME')) {
+            $this->defaultLanguage = Language::getDefaultLanguage(['lang_code'])?->lang_code;
             $this->supportedLocales = Language::getSupportedLocales();
         }
 
@@ -614,13 +614,21 @@ class ProductImporter extends Importer implements WithMapping
         $request = new Request();
         $request->merge($row);
 
-        if (
-            ($sku = $request->input('sku')) &&
+        $existingProduct = null;
+
+        if (Arr::get($row, 'id')) {
+            $existingProduct = $this->getProductQuery()
+                ->where('id', $row['id'])
+                ->first();
+        }
+
+        if (! $existingProduct && ($sku = $request->input('sku'))) {
             $existingProduct = $this->getProductQuery()
                 ->where('sku', $sku)
-                ->when(Arr::get($row, 'id'), fn ($query) => $query->where('id', $row['id']))
-                ->first()
-        ) {
+                ->first();
+        }
+
+        if ($existingProduct) {
             /**
              * @var Product $existingProduct
              */

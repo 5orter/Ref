@@ -10,6 +10,7 @@ class BackupRequest extends Request
     {
         return [
             'name' => ['required', 'string', 'max:250'],
+            'backup_only_db' => ['nullable', 'boolean'],
         ];
     }
 }

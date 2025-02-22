@@ -76,7 +76,7 @@ class RecentOrdersTable extends TableAbstract
                 'payment_id',
             ])
             ->with($with)
-            ->where('is_finished', 1)
+            ->where('is_finished', true)
             ->whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate)
             ->orderByDesc('created_at')

@@ -155,7 +155,7 @@ class ContactRequest extends Request
 
     protected function alwaysMandatoryFields(): array
     {
-        return ['name', 'content'];
+        return ['name', 'content', 'agree_terms_and_policy'];
     }
 
     public function applyRules(array $rules, ?string $displayFields, ?string $mandatoryFields): array

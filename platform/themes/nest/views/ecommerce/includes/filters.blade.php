@@ -6,7 +6,7 @@
 
         $layout = ($layout && in_array($layout, array_keys(get_product_single_layouts()))) ? $layout : 'product-right-sidebar';
     } else {
-        $requestLayout = request()->input('layout');
+        $requestLayout = BaseHelper::stringify(request()->input('layout'));
         if ($requestLayout && in_array($requestLayout, array_keys(get_product_single_layouts()))) {
             $layout = $requestLayout;
         }
@@ -18,13 +18,15 @@
                     ->add('custom-scrollbar-css', 'plugins/mcustom-scrollbar/jquery.mCustomScrollbar.css');
     Theme::asset()->container('footer')->usePath()
                 ->add('custom-scrollbar-js', 'plugins/mcustom-scrollbar/jquery.mCustomScrollbar.js', ['jquery']);
-
-    [$categories, $brands, $tags, $rand, $categoriesRequest, $urlCurrent, $categoryId, $maxFilterPrice] = EcommerceHelper::dataForFilter($category ?? null);
 @endphp
 
-<input type="hidden" name="layout" value="{{ $layout }}">
-
 @if ($layout === 'product-full-width')
+    @php
+        [$categories, $brands, $tags, $rand, $categoriesRequest, $urlCurrent, $categoryId, $maxFilterPrice] = EcommerceHelper::dataForFilter($category ?? null);
+    @endphp
+
+    <input type="hidden" name="layout" value="{{ $layout }}">
+
     <div class="shop-product-filter-header my-3" style="display: none">
         <div class="row">
             @if ($categories->isNotEmpty())
@@ -109,63 +111,6 @@
     </div>
 @else
     <div class="product-sidebar">
-        @if($categories->isNotEmpty())
-            <div class="sidebar-widget widget-filter-item product-categories-filter-widget mb-30" data-type="price">
-                <h5 class="section-title style-1 mb-30">{{ __('Categories') }}</h5>
-                <div class="custome-checkbox ps-custom-scrollbar">
-                    <ul class="ps-list--categories">
-                        @include(Theme::getThemeNamespace('views.ecommerce.includes.categories'), [
-                            'categories' => $categories,
-                            'activeCategoryId' => $categoryId,
-                            'categoriesRequest' => $categoriesRequest,
-                            'urlCurrent' => $urlCurrent
-                        ])
-                    </ul>
-                </div>
-            </div>
-        @endif
-
-        @if ($maxFilterPrice)
-            <div class="sidebar-widget widget-filter-item mb-30" data-type="price">
-                <h5 class="section-title style-1 mb-30" data-title="{{ __('Price') }}">{{ __('Price Range') }}</h5>
-                @include(Theme::getThemeNamespace('views.ecommerce.includes.filter-by-price'))
-            </div>
-        @endif
-
-        @if ($brands->isNotEmpty())
-            <div class="sidebar-widget widget-filter-item mb-30">
-                <h5 class="section-title style-1 mb-30">{{ __('Brands') }}</h5>
-                <div class="custome-checkbox ps-custom-scrollbar">
-                    @foreach($brands as $brand)
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="brands[]" value="{{ $brand->id }}" @checked(in_array($brand->id, request()->query('brands', []))) id="brand-filter-{{ $brand->id }}">
-                            <label class="form-check-label" for="brand-filter-{{ $brand->id }}">
-                                {{ $brand->name }} ({{ $brand->products_count }})
-                            </label>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-
-        @if ($tags->isNotEmpty())
-            <div class="sidebar-widget widget-filter-item mb-30">
-                <h5 class="section-title style-1 mb-30">{{ __('Tags') }}</h5>
-                <div class="custome-checkbox ps-custom-scrollbar">
-                    @foreach($tags as $tag)
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="tags[]" value="{{ $tag->id }}" @checked(in_array($tag->id, request()->query('tags', []))) id="tag-filter-{{ $tag->id }}">
-                            <label class="form-check-label" for="tag-filter-{{ $tag->id }}">
-                                {{ $tag->name }} ({{ $tag->products_count }})
-                            </label>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-
-        {!! render_product_swatches_filter([
-            'view' => Theme::getThemeNamespace('views.ecommerce.attributes.attributes-filter-sidebar-renderer')
-        ]) !!}
+        @include('plugins/ecommerce::themes.includes.filters', ['view' => Theme::getThemeNamespace('views.ecommerce.attributes.attributes-filter-sidebar-renderer')])
     </div>
 @endif

@@ -78,6 +78,21 @@ app()->booted(function (): void {
                 ],
             ],
         ])
+        ->setField([
+            'id' => 'hotline_subtitle_text',
+            'section_id' => 'opt-text-subsection-general',
+            'type' => 'text',
+            'label' => __('Hotline subtitle (default: 24/7 Support Center)'),
+            'attributes' => [
+                'name' => 'hotline_subtitle_text',
+                'value' => null,
+                'options' => [
+                    'class' => 'form-control',
+                    'placeholder' => __('E.g: 24/7 Support Center'),
+                    'data-counter' => 250,
+                ],
+            ],
+        ])
         ->setSection([
             'title' => __('Social links'),
             'desc' => __('Social links'),
@@ -178,7 +193,7 @@ app()->booted(function (): void {
                 'value' => null,
                 'fields' => [
                     [
-                        'type' => 'themeIcon',
+                        'type' => 'coreIcon',
                         'label' => __('Icon'),
                         'attributes' => [
                             'name' => 'icon',
@@ -551,7 +566,7 @@ app()->booted(function (): void {
             'label' => __('Text color'),
             'attributes' => [
                 'name' => 'color_text',
-                'value' => '#7E7E7E',
+                'value' => '#4c4c4c',
             ],
         ])
         ->setField([

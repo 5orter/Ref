@@ -11,7 +11,7 @@
                             <i class="{{ $categoryIcon }}"></i>
                         @endif {{ $category->name }}
                     </a>
-                    <span class="count">{{ $category->products_count }}</span>
+                    <span class="count">{{ $category->count_all_products }}</span>
                 </li>
             @endforeach
         </ul>

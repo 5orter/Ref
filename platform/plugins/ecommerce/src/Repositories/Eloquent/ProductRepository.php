@@ -337,26 +337,28 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
 
         $isUsingDefaultCurrency = get_application_currency_id() == cms_currency()->getDefaultCurrency()->getKey();
 
-        $currentExchangeRate = get_current_exchange_rate();
-
-        if ($filters['min_price'] && ! $isUsingDefaultCurrency) {
-            $filters['min_price'] = (float) $filters['min_price'] / $currentExchangeRate;
-        }
-
-        if ($filters['max_price'] && ! $isUsingDefaultCurrency) {
-            $filters['max_price'] = (float) $filters['max_price'] / $currentExchangeRate;
-        }
-
         $priceRanges = $filters['price_ranges'];
 
-        if (! empty($priceRanges)) {
-            foreach ($priceRanges as $priceRangeKey => $priceRange) {
-                if ($priceRange['from'] && ! $isUsingDefaultCurrency) {
-                    $priceRanges[$priceRangeKey]['from'] = (float) $priceRange['from'] / $currentExchangeRate;
-                }
+        if (! $isUsingDefaultCurrency) {
+            $currentExchangeRate = get_current_exchange_rate();
 
-                if ($priceRange['to'] && ! $isUsingDefaultCurrency) {
-                    $priceRanges[$priceRangeKey]['to'] = (float) $priceRange['to'] / $currentExchangeRate;
+            if ($filters['min_price']) {
+                $filters['min_price'] = (float) $filters['min_price'] / $currentExchangeRate;
+            }
+
+            if ($filters['max_price']) {
+                $filters['max_price'] = (float) $filters['max_price'] / $currentExchangeRate;
+            }
+
+            if (! empty($priceRanges)) {
+                foreach ($priceRanges as $priceRangeKey => $priceRange) {
+                    if ($priceRange['from']) {
+                        $priceRanges[$priceRangeKey]['from'] = (float) $priceRange['from'] / $currentExchangeRate;
+                    }
+
+                    if ($priceRange['to']) {
+                        $priceRanges[$priceRangeKey]['to'] = (float) $priceRange['to'] / $currentExchangeRate;
+                    }
                 }
             }
         }

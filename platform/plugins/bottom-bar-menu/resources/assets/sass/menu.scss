@@ -25,6 +25,22 @@
             margin: 0;
             padding: 0;
 
+            &.menu--footer__hide_text {
+                li {
+                    a {
+                        padding: 1rem;
+
+                        i {
+                            font-size: 24px;
+                        }
+
+                        span {
+                            display: none;
+                        }
+                    }
+                }
+            }
+
             li {
                 flex-grow: 1;
                 padding: 5px 0 !important;
@@ -45,7 +61,7 @@
 
                     span {
                         color: #000;
-                        font-size: 12px;
+                        font-size: var(--bottom-bar-menu-text-font-size);
                     }
 
                     .fi-rs-shopping-cart {

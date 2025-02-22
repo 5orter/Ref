@@ -1,8 +1,8 @@
 @php
     $sorts = EcommerceHelper::getSortParams();
     $shows = EcommerceHelper::getShowParams();
-    $sortBy = request()->input('sort-by', 'default_sorting');
-    $showing = (int)request()->input('num', (int)theme_option('number_of_products_per_page', 12));
+    $sortBy = BaseHelper::stringify(request()->input('sort-by', 'default_sorting'));
+    $showing = BaseHelper::stringify((int)request()->input('num', (int)theme_option('number_of_products_per_page', 12))) ?: 12;
 @endphp
 
 <div class="sort-by-product-area">
@@ -12,7 +12,7 @@
                 <span><i class="fi-rs-apps"></i>{{ __('Show:') }}</span>
             </div>
             <div class="sort-by-dropdown-wrap">
-                <span> {!! Arr::get($shows, $showing, (int)theme_option('number_of_products_per_page', 12)) !!} <i class="fi-rs-angle-small-down"></i></span>
+                <span> {{ Arr::get($shows, $showing, (int)theme_option('number_of_products_per_page', 12)) }} <i class="fi-rs-angle-small-down"></i></span>
             </div>
         </div>
         <div class="sort-by-dropdown products_ajaxsortby" data-name="num">
@@ -33,7 +33,7 @@
                 <span><i class="fi-rs-apps-sort"></i>{{ __('Sort by:') }}</span>
             </div>
             <div class="sort-by-dropdown-wrap">
-                <span><span>{!! Arr::get($sorts, $sortBy) !!}</span> <i class="fi-rs-angle-small-down"></i></span>
+                <span><span>{{ Arr::get($sorts, $sortBy) }}</span> <i class="fi-rs-angle-small-down"></i></span>
             </div>
         </div>
         <div class="sort-by-dropdown products_ajaxsortby" data-name="sort-by">

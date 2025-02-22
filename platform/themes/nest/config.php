@@ -1,6 +1,7 @@
 <?php
 
 use Botble\Base\Facades\BaseHelper;
+use Botble\Ecommerce\Facades\EcommerceHelper;
 use Botble\Shortcode\View\View;
 use Botble\Theme\Theme;
 
@@ -45,7 +46,7 @@ return [
         // this event should call to assign some assets,
         // breadcrumb template.
         'beforeRenderTheme' => function (Theme $theme): void {
-            $version = get_cms_version();
+            $version = get_cms_version() . '.3';
 
             $theme->asset()->usePath()->add('normalize-css', 'css/vendors/normalize.css');
 
@@ -92,6 +93,10 @@ return [
                 $theme->composer(['page', 'post', 'ecommerce.product'], function (View $view): void {
                     $view->withShortcodes();
                 });
+            }
+
+            if (is_plugin_active('ecommerce')) {
+                EcommerceHelper::registerThemeAssets();
             }
         },
 

@@ -71,6 +71,7 @@ class TopSellingProductsTable extends TableAbstract
         $query = $query
             ->whereDate('ec_orders.created_at', '>=', $startDate)
             ->whereDate('ec_orders.created_at', '<=', $endDate)
+            ->where('ec_orders.is_finished', true)
             ->select([
                 'ec_products.id as id',
                 'ec_products.is_variation as is_variation',

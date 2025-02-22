@@ -1,7 +1,10 @@
 {!! SeoHelper::render() !!}
 
 @if ($favicon = theme_option('favicon'))
-    {{ Html::favicon(RvMedia::getImageUrl($favicon)) }}
+    {{ Html::favicon(
+        RvMedia::getImageUrl($favicon),
+        ['type' => rescue(fn () => File::mimeType(RvMedia::getRealPath($favicon)), 'image/x-icon')]
+    ) }}
 @endif
 
 @if (Theme::has('headerMeta'))

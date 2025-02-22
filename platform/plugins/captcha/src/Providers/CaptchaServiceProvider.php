@@ -26,7 +26,6 @@ use Illuminate\Foundation\AliasLoader;
 use Illuminate\Http\Request as IlluminateRequest;
 use Illuminate\Routing\Events\Routing;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Validator;
 
 class CaptchaServiceProvider extends ServiceProvider
@@ -125,7 +124,7 @@ class CaptchaServiceProvider extends ServiceProvider
             }
         });
 
-        Event::listen(Routing::class, function (): void {
+        $this->app['events']->listen(Routing::class, function (): void {
             add_filter('core_request_rules', function (array $rules, Request $request) {
                 if (! CaptchaFacade::isEnabled() && ! CaptchaFacade::mathCaptchaEnabled()) {
                     return $rules;
@@ -215,7 +214,7 @@ class CaptchaServiceProvider extends ServiceProvider
         }, __('Math Captcha Verification Failed!'));
     }
 
-    public function mapParameterToOptions(array $parameters = []): array
+    public function mapParameterToOptions(?array $parameters = []): array
     {
         if (! is_array($parameters)) {
             return [];

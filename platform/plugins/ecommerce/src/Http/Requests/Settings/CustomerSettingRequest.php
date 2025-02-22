@@ -14,6 +14,7 @@ class CustomerSettingRequest extends Request
             'enabled_customer_account_deletion' => [$onOffRule],
             'login_using_phone' => [$onOffRule],
             'enabled_customer_dob_field' => [$onOffRule],
+            'enabled_phone_field_in_registration_form' => [$onOffRule],
             'make_customer_phone_number_required' => [$onOffRule],
             'login_option' => ['required', 'string', 'in:email,phone,email_or_phone'],
         ];

@@ -104,6 +104,7 @@ class ProductAttributeSet extends BaseModel
             })
             ->with($with)
             ->orderBy('ec_product_attribute_sets.order')
+            ->latest('ec_product_attribute_sets.created_at')
             ->wherePublished()
             ->get();
     }

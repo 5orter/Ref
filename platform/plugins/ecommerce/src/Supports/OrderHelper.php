@@ -130,7 +130,7 @@ class OrderHelper
             $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
             if ($mailer->templateEnabled('admin_new_order')) {
                 $this->setEmailVariables($firstOrder);
-                $mailer->sendUsingTemplate('admin_new_order', get_admin_email()->toArray());
+                $mailer->sendUsingTemplate('admin_new_order');
             }
 
             // Temporarily only send emails with the first order
@@ -288,11 +288,7 @@ class OrderHelper
             if ($mailer->templateEnabled('customer_new_order')) {
                 $this->setEmailVariables($order);
 
-                EmailHandler::send(
-                    $mailer->getTemplateContent('customer_new_order'),
-                    $mailer->getTemplateSubject('customer_new_order'),
-                    $order->user->email ?: $order->address->email
-                );
+                $mailer->sendUsingTemplate('customer_new_order', $order->user->email ?: $order->address->email);
 
                 if ($saveHistory) {
                     OrderHistory::query()->create([
@@ -332,7 +328,9 @@ class OrderHelper
 
     public function setOrderCompleted(int|string $orderId, Request $request, int|string $userId = 0): Order
     {
-        /** @var Order $order */
+        /**
+         * @var Order $order
+         */
         $order = Order::query()->findOrFail($orderId);
 
         $order->status = OrderStatusEnum::COMPLETED;
@@ -347,7 +345,7 @@ class OrderHelper
             'action' => OrderHistoryActionEnum::MARK_ORDER_AS_COMPLETED,
             'description' => trans('plugins/ecommerce::order.mark_as_completed.history', [
                 'admin' => Auth::check() ? Auth::user()->name : 'system',
-                'time' => Carbon::now(),
+                'time' => $order->completed_at,
             ]),
             'order_id' => $orderId,
             'user_id' => $userId,
@@ -533,7 +531,7 @@ class OrderHelper
             $options = $this->getProductOptionData($requestOption);
         }
 
-        $taxClasses= $parentProduct->taxes->pluck('percentage', 'title')->all();
+        $taxClasses = $parentProduct->taxes->pluck('percentage', 'title')->all();
 
         $taxRate = $parentProduct->total_taxes_percentage;
 
@@ -852,7 +850,7 @@ class OrderHelper
                     'order_id' => $sessionData['created_order_id'],
                     'product_id' => $cartItem->id,
                     'product_name' => $cartItem->name,
-                    'product_image' => $productByCartItem->original_product->image,
+                    'product_image' => $cartItem->options['image'],
                     'qty' => $cartItem->qty,
                     'weight' => $productByCartItem->weight * $cartItem->qty,
                     'price' => $cartItem->price,
@@ -1029,6 +1027,17 @@ class OrderHelper
 
         $order->save();
 
+        if (
+            is_plugin_active('payment')
+            && $order->payment_id
+            && $order->payment->id
+            && $order->payment->status == PaymentStatusEnum::PENDING
+        ) {
+            $payment = $order->payment;
+            $payment->status = PaymentStatusEnum::CANCELED;
+            $payment->save();
+        }
+
         event(new OrderCancelledEvent($order, $reason, $reasonDescription));
 
         foreach ($order->products as $orderProduct) {
@@ -1059,6 +1068,11 @@ class OrderHelper
                 'customer_cancel_order',
                 $order->user->email ?: $order->address->email
             );
+        }
+
+        if ($mailer->templateEnabled('order_cancellation_to_admin')) {
+            $this->setEmailVariables($order);
+            $mailer->sendUsingTemplate('order_cancellation_to_admin');
         }
 
         if (AdminHelper::isInAdmin() && Auth::check() && $mailer->templateEnabled('admin_cancel_order')) {
@@ -1144,7 +1158,9 @@ class OrderHelper
             $payment->save();
         }
 
-        event(new OrderConfirmedEvent($order, EcommerceHelperFacade::isOrderAutoConfirmedEnabled() ? null : Auth::user()));
+        event(
+            new OrderConfirmedEvent($order, EcommerceHelperFacade::isOrderAutoConfirmedEnabled() ? null : Auth::user())
+        );
 
         OrderHistory::query()->create([
             'action' => OrderHistoryActionEnum::CONFIRM_ORDER,

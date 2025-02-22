@@ -77,6 +77,7 @@ const styles = [
     'widget.scss',
     'front-auth.scss',
     'front-ecommerce.scss',
+    'front-ecommerce-missing-bootstrap.scss',
     'front-ecommerce-rtl.scss',
     'front-faq.scss',
     'front-review.scss',

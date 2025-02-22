@@ -211,7 +211,12 @@ class Location
 
         $dataPath = storage_path('app/locations-master/' . $countryCode);
 
-        abort_unless(File::isDirectory($dataPath), 404);
+        if (! File::isDirectory($dataPath)) {
+            return [
+                'error' => true,
+                'message' => trans('plugins/location::bulk-import.cant_download_location_at_this_time'),
+            ];
+        }
 
         $country = file_get_contents($dataPath . '/country.json');
         $country = json_decode($country, true);

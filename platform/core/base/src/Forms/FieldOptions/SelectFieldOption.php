@@ -88,7 +88,7 @@ class SelectFieldOption extends FormFieldOptions
         return $this;
     }
 
-    public function emptyValue(string $value): static
+    public function emptyValue(string|bool|int|null $value): static
     {
         $this->emptyValue = $value;
 

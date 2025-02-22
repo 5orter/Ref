@@ -23,7 +23,11 @@ class StoreTagService extends StoreTagServiceAbstract
             $tagsInput = is_array($tagsInput) ? $tagsInput : collect(json_decode($tagsInput, true))->pluck('value')->all();
         }
 
-        $tags = $post->tags->pluck('name')->all();
+        $tags = [];
+
+        if ($post->tags) {
+            $tags = $post->tags->pluck('name')->all();
+        }
 
         if (count($tags) != count($tagsInput) || count(array_diff($tags, $tagsInput)) > 0) {
             $post->tags()->detach();

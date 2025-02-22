@@ -74,7 +74,7 @@
 
         @if($product->variations->isNotEmpty())
             <x-core::form.on-off.checkbox
-                label="Apply for all variations"
+                :label="trans('plugins/ecommerce::products.apply_for_all_variations')"
                 name="cross_sale_products[{{ $product->id }}][apply_to_all_variations]"
                 :checked="$product->pivot->apply_to_all_variations"
                 data-bb-toggle="collapse"
@@ -89,7 +89,7 @@
                     <input
                         type="hidden"
                         name="cross_sale_products[{{ $variationProduct->product->id }}][id]"
-                        value="1"
+                        value="{{ $variationProduct->product->id }}"
                     />
                     <input
                         type="hidden"

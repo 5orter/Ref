@@ -48,9 +48,12 @@ class PublicCartController extends BaseController
             ) ?: new Collection();
         }
 
-        SeoHelper::setTitle(__('Shopping Cart'));
+        $title = __('Shopping Cart');
 
-        Theme::breadcrumb()->add(__('Shopping Cart'), route('public.cart'));
+        SeoHelper::setTitle(theme_option('ecommerce_cart_seo_title') ?: $title)
+            ->setDescription(theme_option('ecommerce_cart_seo_description'));
+
+        Theme::breadcrumb()->add($title, route('public.cart'));
 
         app(GoogleTagManager::class)->viewCart();
 
@@ -73,7 +76,7 @@ class PublicCartController extends BaseController
                 ->setMessage(__('This product is out of stock or not exists!'));
         }
 
-        if ($product->variations->count() > 0 && ! $product->is_variation) {
+        if ($product->variations->count() > 0 && ! $product->is_variation && $product->defaultVariation->product->id) {
             $product = $product->defaultVariation->product;
         }
 
@@ -98,12 +101,20 @@ class PublicCartController extends BaseController
                 ->setMessage($e->getMessage());
         }
 
-        $maxQuantity = $product->quantity;
+        $maxQuantity = $product->max_cart_quantity;
 
-        if (! $product->canAddToCart($request->input('qty', 1))) {
+        $requestQuantity = $request->integer('qty', 1);
+
+        $existingAddedToCart = Cart::instance('cart')->content()->firstWhere('id', $product->id);
+
+        if ($existingAddedToCart) {
+            $requestQuantity += $existingAddedToCart->qty;
+        }
+
+        if (! $product->canAddToCart($requestQuantity)) {
             return $response
                 ->setError()
-                ->setMessage(__('Maximum quantity is :max!', ['max' => $maxQuantity]));
+                ->setMessage(__('Sorry, you can only order a maximum of :quantity units of :product at a time. Please adjust the quantity and try again.', ['quantity' => $maxQuantity, 'product' => $product->name]));
         }
 
         $outOfQuantity = false;

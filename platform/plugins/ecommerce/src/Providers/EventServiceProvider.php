@@ -6,6 +6,7 @@ use Botble\Base\Events\CreatedContentEvent;
 use Botble\Base\Events\DeletedContentEvent;
 use Botble\Base\Events\RenderingAdminWidgetEvent;
 use Botble\Base\Events\UpdatedContentEvent;
+use Botble\Ecommerce\Events\CustomerEmailVerified;
 use Botble\Ecommerce\Events\OrderCancelledEvent;
 use Botble\Ecommerce\Events\OrderCompletedEvent;
 use Botble\Ecommerce\Events\OrderCreated;
@@ -29,6 +30,7 @@ use Botble\Ecommerce\Listeners\OrderReturnedNotification;
 use Botble\Ecommerce\Listeners\RegisterEcommerceWidget;
 use Botble\Ecommerce\Listeners\RenderingSiteMapListener;
 use Botble\Ecommerce\Listeners\SaveProductFaqListener;
+use Botble\Ecommerce\Listeners\SendMailsAfterCustomerEmailVerified;
 use Botble\Ecommerce\Listeners\SendMailsAfterCustomerRegistered;
 use Botble\Ecommerce\Listeners\SendProductFileUpdatedNotification;
 use Botble\Ecommerce\Listeners\SendProductReviewsMailAfterOrderCompleted;
@@ -69,6 +71,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         Registered::class => [
             SendMailsAfterCustomerRegistered::class,
+        ],
+        CustomerEmailVerified::class => [
+            SendMailsAfterCustomerEmailVerified::class,
         ],
         OrderPlacedEvent::class => [
             SendWebhookWhenOrderPlaced::class,
@@ -126,7 +131,7 @@ class EventServiceProvider extends ServiceProvider
 
         $events->listen(
             ['cart.added', 'cart.removed', 'cart.stored', 'cart.restored', 'cart.updated'],
-            function ($cart): void {
+            function ($cart = null): void {
                 $coupon = session('applied_coupon_code');
                 if ($coupon) {
                     $this->app->make(HandleRemoveCouponService::class)->execute();

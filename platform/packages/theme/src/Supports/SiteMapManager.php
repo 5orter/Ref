@@ -12,9 +12,11 @@ class SiteMapManager
 {
     protected array $keys = ['sitemap', 'pages'];
 
+    protected array $removedKeys = [];
+
     protected string $extension = 'xml';
 
-    protected string $defaultDate = '2023-06-01 00:00';
+    protected string $defaultDate = '2024-11-01 00:00';
 
     public function __construct(protected Sitemap $siteMap)
     {
@@ -43,7 +45,9 @@ class SiteMapManager
 
     public function addSitemap(string $loc, ?string $lastModified = null): self
     {
-        if (! $this->isCached()) {
+        $removedLoc = array_map(fn ($item) => $this->route($item), $this->removedKeys);
+
+        if (! $this->isCached() && ! in_array($loc, $removedLoc)) {
             $this->siteMap->addSitemap($loc, $lastModified ?: $this->defaultDate);
         }
 
@@ -82,7 +86,7 @@ class SiteMapManager
 
     public function getKeys(): array
     {
-        return $this->keys;
+        return array_filter($this->keys, fn ($item) => ! in_array($item, $this->removedKeys));
     }
 
     public function registerKey(string|array $key, ?string $value = null): self
@@ -98,16 +102,17 @@ class SiteMapManager
 
     public function removeKey(array|string $key): self
     {
-        foreach ((array) $key as $item) {
-            unset($this->keys[$item]);
-        }
+        $this->removedKeys = [
+            ...$this->removedKeys,
+            ...(array) $key,
+        ];
 
         return $this;
     }
 
     public function allowedExtensions(): array
     {
-        $extensions = ['xml', 'html', 'txt', 'ror-rss', 'ror-rdf'];
+        $extensions = ['xml', 'xml-mobile', 'html', 'txt', 'ror-rss', 'ror-rdf', 'google-news'];
 
         $slugPostfix = SlugHelper::getPublicSingleEndingURL();
 

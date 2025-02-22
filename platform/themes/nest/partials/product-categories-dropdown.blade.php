@@ -1,6 +1,7 @@
 @foreach(!$more ? $categories->take(10)->chunk(5) : $categories->skip(10)->chunk(ceil((count($categories) - 10) / 2)) as $chunk)
     <ul @if ($loop->last) class="end" @endif>
         @foreach($chunk as $category)
+            @if($category->parent_id == 0)
             <li>
                 <a href="{{ route('public.single', $category->url) }}">
                     @if ($categoryImage = $category->icon_image)
@@ -10,6 +11,7 @@
                     @endif {{ $category->name }}
                 </a>
             </li>
+            @endif
         @endforeach
     </ul>
 @endforeach

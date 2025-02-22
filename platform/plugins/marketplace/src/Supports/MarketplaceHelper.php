@@ -7,9 +7,11 @@ use Botble\Base\Supports\EmailHandler as BaseEmailHandler;
 use Botble\Ecommerce\Enums\DiscountTypeOptionEnum;
 use Botble\Ecommerce\Facades\OrderHelper;
 use Botble\Ecommerce\Models\Order as OrderModel;
+use Botble\Media\Facades\RvMedia;
 use Botble\Theme\Facades\Theme;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class MarketplaceHelper
 {
@@ -227,5 +229,21 @@ class MarketplaceHelper
     public function isSingleVendorCheckout(): bool
     {
         return (bool) $this->getSetting('single_vendor_checkout', false);
+    }
+
+    public function mediaMimeTypesAllowed(): array
+    {
+        $allowedMimeTypes = $this->getSetting('media_mime_types_allowed', []);
+
+        if (! is_array($allowedMimeTypes) && Str::isJson($allowedMimeTypes)) {
+            $allowedMimeTypes = json_decode($allowedMimeTypes, true);
+        }
+
+        if (empty($allowedMimeTypes)) {
+            $allowedMimeTypes = RvMedia::getConfig('allowed_mime_types');
+            $allowedMimeTypes = explode(',', $allowedMimeTypes);
+        }
+
+        return $allowedMimeTypes;
     }
 }

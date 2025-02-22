@@ -1,6 +1,14 @@
 @php
     $orders = $order;
-    $order = $order instanceof \Illuminate\Support\Collection ? $order->first() : $order;
+
+    if ($order instanceof \Illuminate\Support\Collection) {
+        $order = $order->where('is_finished', true)->first();
+
+        if (! $order) {
+            $order = $order->first();
+        }
+    }
+
     $userInfo = $order->address->id ? $order->address : $order->user;
 @endphp
 

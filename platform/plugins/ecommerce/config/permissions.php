@@ -517,6 +517,31 @@ return [
         'parent_flag' => 'ecommerce.settings',
     ],
     [
+        'name' => 'Shipping Rules',
+        'flag' => 'ecommerce.shipping-rule-items.index',
+        'parent_flag' => 'ecommerce.settings',
+    ],
+    [
+        'name' => 'Create',
+        'flag' => 'ecommerce.shipping-rule-items.create',
+        'parent_flag' => 'ecommerce.shipping-rule-items.index',
+    ],
+    [
+        'name' => 'Edit',
+        'flag' => 'ecommerce.shipping-rule-items.edit',
+        'parent_flag' => 'ecommerce.shipping-rule-items.index',
+    ],
+    [
+        'name' => 'Delete',
+        'flag' => 'ecommerce.shipping-rule-items.destroy',
+        'parent_flag' => 'ecommerce.shipping-rule-items.index',
+    ],
+    [
+        'name' => 'Bulk Import',
+        'flag' => 'ecommerce.shipping-rule-items.bulk-import',
+        'parent_flag' => 'ecommerce.shipping-rule-items.index',
+    ],
+    [
         'name' => 'Tracking',
         'flag' => 'ecommerce.settings.tracking',
         'parent_flag' => 'ecommerce.settings',

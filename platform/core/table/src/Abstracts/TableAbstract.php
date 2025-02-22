@@ -451,8 +451,12 @@ abstract class TableAbstract extends DataTable implements ExtensibleContract
         return $this;
     }
 
-    public function removeColumns(array $columns): static
+    public function removeColumns(array $columns = []): static
     {
+        if (! $columns) {
+            $columns = array_map(fn ($column) => $column->get('data'), $this->getColumns());
+        }
+
         foreach ($columns as $column) {
             $this->removeColumn($column);
         }

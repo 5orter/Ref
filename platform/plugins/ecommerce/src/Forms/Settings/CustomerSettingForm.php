@@ -45,6 +45,15 @@ class CustomerSettingForm extends SettingForm
                     ->value(get_ecommerce_setting('enabled_customer_dob_field', true))
             )
             ->add(
+                'enabled_phone_field_in_registration_form',
+                OnOffCheckboxField::class,
+                OnOffFieldOption::make()
+                    ->label(trans('plugins/ecommerce::setting.customer.form.enabled_phone_field_in_registration_form'))
+                    ->helperText(trans('plugins/ecommerce::setting.customer.form.enabled_phone_field_in_registration_form_helper'))
+                    ->value($phoneFieldEnabled = get_ecommerce_setting('enabled_phone_field_in_registration_form', true))
+            )
+            ->addOpenCollapsible('enabled_phone_field_in_registration_form', '1', $phoneFieldEnabled == '1')
+            ->add(
                 'make_customer_phone_number_required',
                 OnOffCheckboxField::class,
                 OnOffFieldOption::make()
@@ -52,6 +61,7 @@ class CustomerSettingForm extends SettingForm
                     ->helperText(trans('plugins/ecommerce::setting.customer.form.make_customer_phone_number_required_helper'))
                     ->value(get_ecommerce_setting('make_customer_phone_number_required', false))
             )
+            ->addCloseCollapsible('enabled_phone_field_in_registration_form', '1')
             ->add(
                 'login_option',
                 RadioField::class,
